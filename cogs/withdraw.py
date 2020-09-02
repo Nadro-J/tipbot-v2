@@ -29,11 +29,11 @@ class Withdraw(commands.Cog):
     @commands.command(pass_context=True)
     async def withdraw(self, ctx, address: str, amount: float):
         """Withdraw coins from your account to any address, You agree to pay a withdrawal fee to support the costs of this service"""
-        snowflake = ctx.message.author.id    
+        snowflake = ctx.message.author.id
         if amount <= float(self.minwithdraw):
             await ctx.author.send("{} **:warning: Minimum withdrawal amount is {:.8f} {} :warning:**".format(ctx.message.author.mention, float(self.minwithdraw), self.currency_symbol))
             return
-        
+
         # await self.bot.say("checkingbotfee")
         # calculate bot fee and pay to owner in form of a tip
         botfee = amount * float(self.withdrawfee)
@@ -42,7 +42,7 @@ class Withdraw(commands.Cog):
             amount = amount - botfee
         else:
             amount = amount - botfee
-        
+
         # await self.bot.say("checking amount")
         abs_amount = abs(amount)
         if math.log10(abs_amount) > 8:
@@ -53,7 +53,7 @@ class Withdraw(commands.Cog):
         # await self.bot.say("rpc call to check address")
         conf = rpc.validateaddress(address)
         if not conf["isvalid"]:
-            await self.bot.say("{} **:warning: Invalid address! :warning:**".format(ctx.message.author.mention))
+            await ctx.send("{} **:warning: Invalid address! :warning:**".format(ctx.message.author.mention))
             return
 
         # await self.bot.say("check if owned by bot")
@@ -62,7 +62,6 @@ class Withdraw(commands.Cog):
             if address_info["address"] == address:
                 ownedByBot = True
                 break
-
         if ownedByBot:
             await self.bot.say("{} **:warning: You cannot withdraw to an address owned by this bot! :warning:** Please use tip instead!".format(ctx.message.author.mention))
             return
@@ -98,7 +97,7 @@ class Withdraw(commands.Cog):
             except discord.HTTPException:
                 await ctx.send("I need the `Embed links` permission to send this")
 
-            if ctx.message.server is not None:
+            if ctx.message.guild is not None:
                 await ctx.send("{}, I PMed you your **Withdrawal Confirmation**! Make sure to double check that it is from me!".format(usermention))
                 await ctx.send(":warning: {}, To Protect Your Privacy, please make Withdrawals by messaging me directly next time. :warning:".format(usermention))
 

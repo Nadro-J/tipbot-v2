@@ -418,7 +418,7 @@ class Mysql:
             if not res:
                 return None
 
-            txid = rpc.sendtoaddress(str(address), str(amount) - self.txfee)
+            txid = rpc.sendtoaddress(address, amount - self.txfee)
             if not txid:
                 return None
 

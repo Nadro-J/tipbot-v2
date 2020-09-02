@@ -18,7 +18,6 @@ class Rpc:
                                 auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']
 
-
     def getnewaddress(self, account):
         payload = json.dumps({"method": "getnewaddress", "params": [account], "jsonrpc": "2.0"})
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
@@ -56,7 +55,7 @@ class Rpc:
         return response.json()['result']
 
     def sendtoaddress(self, address, amount):
-        payload = json.dumps({"method": "sendtoaddress", "params": [address, amount], "jsonrpc": "2.0"})
+        payload = json.dumps({"method": "sendtoaddress", "params": [address, "%.2f" % round(amount, 4)], "jsonrpc": "2.0"})
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
                                 auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']
