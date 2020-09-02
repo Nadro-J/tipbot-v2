@@ -1,13 +1,10 @@
-# HTMLCOIN-Tip-Bot-for-Discord
-
-
-These files are intended to function as a multi-functional tipbot for HTMLCOIN Coin (HTML).
+# BitGreen Tipbot
 
 # Requirements
 * discord.py installed
 * Python 3.6+
 * A MySQL database
-* The HTMLOCIN wallet w/ RPC enabled.
+* The BitGreen wallet w/ RPC enabled.
 
 # Functions
 * Display general wallet information
