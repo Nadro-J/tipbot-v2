@@ -5,7 +5,7 @@ from utils import parsing, checks, mysql_module
 mysql = mysql_module.Mysql()
 
 
-class Server:
+class Server(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -5,7 +5,7 @@ from utils import parsing, checks
 config = parsing.parse_json('config.json')["logging"]
 
 
-class Log:
+class Log(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

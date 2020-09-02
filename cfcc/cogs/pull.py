@@ -2,7 +2,7 @@ import discord, os
 from discord.ext import commands
 from utils import checks, output
 
-class Pull:
+class Pull(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

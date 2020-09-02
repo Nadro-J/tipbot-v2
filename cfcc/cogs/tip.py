@@ -6,7 +6,7 @@ rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
 
-class Tip:
+class Tip(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         config = parsing.parse_json('config.json')         

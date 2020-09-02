@@ -6,7 +6,7 @@ import random
 
 mysql = mysql_module.Mysql()
 
-class Rain:
+class Rain(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

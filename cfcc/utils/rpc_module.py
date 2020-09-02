@@ -1,7 +1,6 @@
 import json, requests
 from utils import parsing
 
-
 class Rpc:
     def __init__(self):
         config = parsing.parse_json('config.json')["rpc"]
@@ -18,6 +17,7 @@ class Rpc:
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
                                 auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']
+
 
     def getnewaddress(self, account):
         payload = json.dumps({"method": "getnewaddress", "params": [account], "jsonrpc": "2.0"})

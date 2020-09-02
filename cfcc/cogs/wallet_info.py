@@ -11,7 +11,7 @@ mysql = mysql_module.Mysql()
 config = parsing.parse_json('config.json')
 bot = commands.Bot(command_prefix=config['prefix'], description=config["description"])
 
-class Wallet:
+class Wallet(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.rpc = rpc.Rpc()

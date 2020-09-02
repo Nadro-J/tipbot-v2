@@ -99,7 +99,7 @@ class Mysql:
             cursor.close()
 
             if result_set is None:
-                address = rpc.getnewaddress(snowflake)
+                address = rpc.getnewaddress(str(snowflake))
                 self.make_user(snowflake, address)
                 
         def get_user(self, snowflake):
@@ -149,7 +149,7 @@ class Mysql:
 # endregion
 
 # region Servers/Channels
-        def check_server(self, server: discord.Server):
+        def check_server(self, server: discord.Guild):
             if server is None:
                 return
             cursor = self.__setup_cursor(
@@ -162,7 +162,7 @@ class Mysql:
             if result_set is None:
                 self.add_server(server)
 
-        def add_server(self, server: discord.Server):
+        def add_server(self, server: discord.Guild):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "INSERT INTO server (server_id, enable_soak) VALUES(%s, %s)"
@@ -204,7 +204,7 @@ class Mysql:
             cursor.close()
             return result_set
 
-        def remove_server(self, server: discord.Server):
+        def remove_server(self, server: discord.Guild):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "DELETE FROM server WHERE server_id = %s"
@@ -214,7 +214,7 @@ class Mysql:
             cursor.close()
             self.__connection.commit()
 
-        def add_channel(self, channel: discord.Channel):
+        def add_channel(self, channel):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)            
             to_exec = "INSERT INTO channel(channel_id, server_id, enabled) VALUES(%s, %s, 1)"
@@ -418,7 +418,7 @@ class Mysql:
             if not res:
                 return None
 
-            txid = rpc.sendtoaddress(address, amount - self.txfee)
+            txid = rpc.sendtoaddress(str(address), str(amount) - self.txfee)
             if not txid:
                 return None
 
@@ -446,7 +446,7 @@ class Mysql:
             cursor.close()
             self.__connection.commit()
 
-        def check_soak(self, server: discord.Server) -> bool:
+        def check_soak(self, server: discord.Guild) -> bool:
             if server is None:
                 return False
             self.check_server(server)

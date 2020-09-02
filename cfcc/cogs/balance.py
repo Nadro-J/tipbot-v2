@@ -11,7 +11,7 @@ rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
 
-class Balance:
+class Balance(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -27,48 +27,6 @@ class Balance:
         self.footer_text = embed_config["footer_msg_text"]
         self.embed_color = int(embed_config["color"], 16)
 
-    #private balance view
-    async def do_embed(self, name, server, db_bal, db_bal_unconfirmed, stake_total, donate_total):
-        # Simple embed function for displaying username and balance
-        embed=discord.Embed(title="You requested your **Balance**", color=self.embed_color)
-        embed.set_author(name=self.bot_name)
-        embed.add_field(name="User", value=name.mention, inline=False)
-        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(db_bal), 8),self.currency_symbol))
-        embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
-        if float(db_bal_unconfirmed) != 0.0:
-            embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(db_bal_unconfirmed), 8),self.currency_symbol))
-        if float(stake_total) != 0.0:
-            embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stake_total), 8),self.currency_symbol))
-        if float(donate_total) != 0.0:
-            embed.add_field(name="Your Total Donations", value="{:.8f} {}".format(round(float(donate_total), 8),self.currency_symbol))
-        embed.set_footer(text=self.footer_text)
-        try:
-            await self.bot.send_message(name, embed=embed)
-            if server is not None:
-                await self.bot.say("{}, I PMed you your **Balance**! Make sure to double check that it is from me!".format(name.mention))
-        except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
-
-    #public balance view
-    async def do_showembed(self, name, db_bal, db_bal_unconfirmed, stake_total, donate_total):
-        # Simple embed function for displaying username and balance
-        embed=discord.Embed(title="You requested your **Balance**", color=self.embed_color)
-        embed.set_author(name=self.bot_name)
-        embed.add_field(name="User", value=name.mention, inline=False)
-        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(db_bal), 8),self.currency_symbol))
-        embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
-        if float(db_bal_unconfirmed) != 0.0:
-            embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(db_bal_unconfirmed), 8),self.currency_symbol))
-        if float(stake_total) != 0.0:
-            embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stake_total), 8),self.currency_symbol))
-        if float(donate_total) != 0.0:
-            embed.add_field(name="Your Total Donations", value="{:.8f} {}".format(round(float(donate_total), 8),self.currency_symbol))
-        embed.set_footer(text=self.footer_text)
-        try:
-            await self.bot.say(embed=embed)
-        except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
-
     @commands.command(pass_context=True)
     async def balance(self, ctx):
         """Display your balance"""
@@ -76,63 +34,37 @@ class Balance:
         snowflake = ctx.message.author.id
 
         # Check if user exists in db
-        mysql.check_for_user(snowflake)
+        mysql.check_for_user(str(snowflake))
 
-        balance = mysql.get_balance(snowflake, check_update=True)
-        balance_unconfirmed = mysql.get_balance(snowflake, check_unconfirmed = True)
-
-        # get the users staking rewards
-        stakes =  mysql.get_tip_amounts_from_id(self.stake_id, snowflake)
-
-        # get the users donated amount
-        donations = mysql.get_tip_amounts_from_id(snowflake, self.donate)
-
-        # Execute and return SQL Query
-        await self.do_embed(ctx.message.author, ctx.message.server, balance, balance_unconfirmed, sum(stakes), sum(donations))
-
-    @commands.command(pass_context=True)
-    async def bal(self, ctx):
-        """Display your balance"""
-        # Set important variables
-        snowflake = ctx.message.author.id
-
-        # Check if user exists in db
-        #mysql.check_for_user(snowflake)
-        if mysql.check_for_user(snowflake) is None:
-            return
-
-        balance = mysql.get_balance(snowflake, check_update=True)
-        balance_unconfirmed = mysql.get_balance(snowflake, check_unconfirmed = True)
+        balance = mysql.get_balance(str(snowflake), check_update=True)
+        balance_unconfirmed = mysql.get_balance(str(snowflake), check_unconfirmed = True)
 
         # get the users staking rewards
-        stakes =  mysql.get_tip_amounts_from_id(self.stake_id, snowflake)
+        stakes = mysql.get_tip_amounts_from_id(self.stake_id, str(snowflake))
 
         # get the users donated amount
-        donations = mysql.get_tip_amounts_from_id(snowflake, self.donate)
-
+        donations = mysql.get_tip_amounts_from_id(str(snowflake), self.donate)
         # Execute and return SQL Query
-        await self.do_embed(ctx.message.author, ctx.message.server, balance, balance_unconfirmed, sum(stakes), sum(donations))
 
-    @commands.command(pass_context=True)
-    async def showbal(self, ctx):
-        """Display your balance"""
-        # Set important variables
-        snowflake = ctx.message.author.id
-
-        # Check if user exists in db
-        mysql.check_for_user(snowflake)
-
-        balance = mysql.get_balance(snowflake, check_update=True)
-        balance_unconfirmed = mysql.get_balance(snowflake, check_unconfirmed = True)
-
-        # get the users staking rewards
-        stakes =  mysql.get_tip_amounts_from_id(self.stake_id, snowflake)
-
-        # get the users donated amount
-        donations = mysql.get_tip_amounts_from_id(snowflake, self.donate)
-
-        # Execute and return SQL Query
-        await self.do_showembed(ctx.message.author, balance, balance_unconfirmed, sum(stakes), sum(donations))
+        # Simple embed function for displaying username and balance
+        embed=discord.Embed(title="You requested your **Balance**", color=self.embed_color)
+        embed.set_author(name=self.bot_name)
+        embed.add_field(name="User", value=ctx.message.author.mention, inline=False)
+        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(balance), 8),self.currency_symbol))
+        embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
+        if float(balance_unconfirmed) != 0.0:
+            embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
+        if float(sum(stakes)) != 0.0:
+            embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stakes), 8),self.currency_symbol))
+        if float(sum(donations)) != 0.0:
+            embed.add_field(name="Your Total Donations", value="{:.8f} {}".format(round(float(donations), 8),self.currency_symbol))
+        embed.set_footer(text=self.footer_text)
+        try:
+            await ctx.author.send(embed=embed)
+            if ctx.message.guild is not None:
+                await ctx.send("{}, I PMed you your **Balance**! Make sure to double check that it is from me!".format(ctx.message.author.mention))
+        except discord.HTTPException:
+            await ctx.send("I need the `Embed links` permission to send this")
 
 def setup(bot):
     bot.add_cog(Balance(bot))

@@ -11,7 +11,7 @@ rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
 
-class Txlist:
+class Txlist(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

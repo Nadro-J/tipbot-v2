@@ -56,8 +56,8 @@ async def on_message(message):
                 Mysql.register_user(ids)
     
     # check if the message is from a banned server
-    if message.server is not None:
-        if Mysql.check_for_server_status(message.server.id) == 2:
+    if message.guild is not None:
+        if Mysql.check_for_server_status(message.guild.id) == 2:
             return
 
     # check if staking account is set up
@@ -96,11 +96,12 @@ async def on_message(message):
             #if they they are not it the database but send the
             if str(message.content).startswith(rkeywordcall) is True:
                 Mysql.register_user(authid)
-                await bot.send_message(message.channel, '{} You are Now Registered. :tada:'.format(message.author.mention))
-                await bot.send_message(message.author, 'Thank You for registering. Use {}deposit to check your {} deposit address'.format(prefix, coin_name))
+                await message.channel.send('{} You are now registered! :tada:'.format(message.author.mention))
+                await message.channel.send('Use {}deposit to view your {} address'.format(prefix, coin_name))
                 return
             elif str(message.content).startswith(prefix) is True:
-                await bot.send_message(message.channel, '{} You are NOT registered. Type **{}** to begin.'.format(message.author.mention, rkeywordcall))
+
+                await message.channel.send('{} You are NOT registered. Type **{}** to begin.'.format(message.author.mention, rkeywordcall))
                 return
         else:
             if Mysql.user_last_msg_check(message.author.id, message.content, helpers.is_private_dm(bot, message.channel)) == False:
@@ -114,14 +115,14 @@ async def send_cmd_help(ctx):
             em = discord.Embed(title="Missing args :x:",
                                description=page.strip("```").replace('<', '[').replace('>', ']'),
                                color=discord.Color.red())
-            await bot.send_message(ctx.message.channel, embed=em)
+            await ctx.send(ctx.message.channel, embed=em)
     else:
         pages = bot.formatter.format_help_for(ctx, ctx.command)
         for page in pages:
             em = discord.Embed(title="Missing args :x:",
                                description=page.strip("```").replace('<', '[').replace('>', ']'),
                                color=discord.Color.red())
-            await bot.send_message(ctx.message.channel, embed=em)
+            await ctx.send(ctx.message.channel, embed=em)
 
 @bot.command(pass_context=True, hidden=True)
 @commands.check(checks.is_owner)
@@ -227,18 +228,19 @@ async def on_channel_create(channel):
     if isinstance(channel, discord.PrivateChannel):
         return
     Mysql.add_channel(channel)
-    output.info("Channel {0} added to {1}".format(channel.name, channel.server.name))
+    output.info("Channel {0} added to {1}".format(channel.name, channel.guild.name))
 
 
 @bot.event
 async def on_channel_delete(channel):
     Mysql.remove_channel(channel)
-    output.info("Channel {0} deleted from {1}".format(channel.name, channel.server.name))
+    output.info("Channel {0} deleted from {1}".format(channel.name, channel.guild.name))
 
 
 @bot.event
-async def on_command_error(error, ctx):
-    channel = ctx.message.channel
+async def on_command_error(ctx, error):
+    channel = ctx.channel.send
+
     if isinstance(error, commands.MissingRequiredArgument):
         await send_cmd_help(ctx)
     elif isinstance(error, commands.BadArgument):
@@ -247,7 +249,7 @@ async def on_command_error(error, ctx):
         output.error("Exception in command '{}', {}".format(ctx.command.qualified_name, error.original))
         oneliner = "Error in command '{}' - {}: {}\nIf this issue persists, Please report it in the support server.".format(
             ctx.command.qualified_name, type(error.original).__name__, str(error.original))
-        await ctx.bot.send_message(channel, oneliner)
+        await ctx.send(oneliner)
 
 database.run()
 bot.run(config["discord"]["token"])

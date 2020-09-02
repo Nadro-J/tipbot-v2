@@ -19,9 +19,9 @@ connection = pymysql.connect(
     db=db)
 cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-#cursor.execute("DROP DATABASE IF EXISTS {};".format(database))
-#cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(database))
-#conn.commit()
+#cursor.execute("DROP DATABASE IF EXISTS {};".format(db))
+#cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
+#connection.commit()
 
 #cursor.execute("USE {};".format(database))
 
@@ -72,3 +72,6 @@ def run():
             FOREIGN KEY (server_id) REFERENCES server(server_id),
             PRIMARY KEY (channel_id)
             )""")
+
+if __name__ == '__main__':
+    run()

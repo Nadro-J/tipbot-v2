@@ -4,7 +4,7 @@ from utils import parsing, checks
 
 start_time = time.time()
 
-class Uptime:
+class Uptime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         config = parsing.parse_json('config.json')

@@ -8,7 +8,7 @@ rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
 
-class Soak:
+class Soak(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         soak_config = parsing.parse_json('config.json')['soak']

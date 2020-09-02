@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 import urllib.request
 import json
 
-class Stats:
+class Stats(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
 
