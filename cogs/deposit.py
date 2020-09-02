@@ -4,7 +4,7 @@ from utils import parsing, mysql_module
 
 mysql = mysql_module.Mysql()
 
-class Deposit:
+class Deposit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         config = parsing.parse_json('config.json')
@@ -23,12 +23,12 @@ class Deposit:
         self.footer_text = embed_config["footer_msg_text"]
         self.embed_color = int(embed_config["color"], 16)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def deposit(self, ctx):
         """Show Your Deposit Address on this Tip Bot Service. Use the address to send coins to your account on this Tip Bot."""
         user = ctx.message.author
         snowflake = ctx.message.author.id
-        balance = mysql.get_balance(snowflake, check_update=True)
+        balance = mysql.get_balance(str(snowflake), check_update=True)
         balance_unconfirmed = mysql.get_balance(snowflake, check_unconfirmed = True)
         # Check if user exists in db
         mysql.check_for_user(user.id)
@@ -37,20 +37,19 @@ class Deposit:
         embed.set_author(name="{}".format(self.bot_name))
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
         embed.add_field(name="User", value="{}".format(user), inline=False)
-        embed.add_field(name="Deposit Address", value="{}".format(user_addy), inline=False)
+        embed.add_field(name="Deposit Address", value="`{}`".format(user_addy), inline=False)
         embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(balance), 8),self.currency_symbol))
         if float(balance_unconfirmed) != 0.0:
             embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
         embed.add_field(name="Deposit Transactions", value="Type $dlist for a list of your deposits.")
-        embed.add_field(name="Mobile Deposit", value="Type $mobile for your deposit address formatted for mobile.")
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.send_message(ctx.message.author, embed=embed)
+            await ctx.author.send(embed=embed)
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
+            await ctx.send("I need the `Embed links` permission to send this")
 
-        if ctx.message.server is not None:
-            await self.bot.say("{}, I PMed you your **Deposit Address**! Make sure to double check that it is from me!".format(user.mention))
+        if ctx.message.guild is not None:
+            await ctx.send("{}, I PMed you your **Deposit Address**! Make sure to double check that it is from me!".format(user.mention))
 
 #    @commands.command(pass_context=True)
 #    async def mobile(self, ctx):
@@ -68,31 +67,31 @@ class Deposit:
 #        if ctx.message.server is not None:
 #            await self.bot.say("{}, I PMed you your **Deposit Address**! Make sure to double check that it is from me!".format(user.mention))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def dlist(self, ctx):
         """Show a list of your Deposits on this Tip Bot Service. TXID, Amount, and Deposit Status are displayed to easily track deposits."""
         user = ctx.message.author
         # only allow this message to be sent privatly for privacy - send a message to the user in the server.    
-        if ctx.message.server is not None:
-            await self.bot.say("{}, I PMed you your **Deposit List**! Make sure to double check that it is from me!".format(user.mention))
+        if ctx.message.guild is not None:
+            await ctx.send("{}, I PMed you your **Deposit List**! Make sure to double check that it is from me!".format(user.mention))
         # begin sending pm transaction list to user
-        await self.bot.send_message(ctx.message.author, "{} You requested Your **{} ({}) Deposits**: \n".format(user.mention, self.coin_name, self.currency_symbol))
+        await ctx.author.send("{} You requested Your **{} ({}) Deposits**: \n".format(user.mention, self.coin_name, self.currency_symbol))
         # Check if user exists in db
         if mysql.check_for_user(user.id) is None:
-            await self.bot.say("User is not found in the database")
+            await ctx.send("User is not found in the database")
             return
         user_addy = mysql.get_address(user.id)
-        await self.bot.send_message(ctx.message.author, "Deposit Address: **{}**".format(user_addy))
+        await ctx.author.send("Deposit Address: **{}**".format(user_addy))
         # Get the list of deposit txns by user.id transactions
         conf_txns = mysql.get_deposit_list_byuser(user.id)
-        await self.bot.send_message(ctx.message.author, "Number of Deposits: **{}**".format(len(conf_txns)))
+        await ctx.author.send("Number of Deposits: **{}**".format(len(conf_txns)))
         # List the transactions
         for txns in conf_txns:
             dep_amount = mysql.get_deposit_amount(txns)
-            await self.bot.send_message(ctx.message.author, "TXID: <https://{}{}>".format(self.explorer, str(txns)))
-            await self.bot.send_message(ctx.message.author, "Deposit amount {:.8f} {}".format(float(dep_amount), self.currency_symbol))
+            await ctx.author.send("TXID: <https://{}{}>".format(self.explorer, str(txns)))
+            await ctx.author.send("Deposit amount {:.8f} {}".format(float(dep_amount), self.currency_symbol))
             dep_status = mysql.get_transaction_status_by_txid(txns)
-            await self.bot.send_message(ctx.message.author, "Deposit Status {}".format(dep_status))
+            await ctx.author.send("Deposit Status {}".format(dep_status))
 
 
 def setup(bot):
