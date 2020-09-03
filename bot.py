@@ -108,21 +108,25 @@ async def on_message(message):
                 return 
             await bot.process_commands(message)
 
-async def send_cmd_help(ctx):
-    if ctx.invoked_subcommand:
-        pages = bot.formatter.format_help_for(ctx, ctx.invoked_subcommand)
-        for page in pages:
-            em = discord.Embed(title="Missing args :x:",
-                               description=page.strip("```").replace('<', '[').replace('>', ']'),
-                               color=discord.Color.red())
-            await ctx.send(ctx.message.channel, embed=em)
-    else:
-        pages = bot.formatter.format_help_for(ctx, ctx.command)
-        for page in pages:
-            em = discord.Embed(title="Missing args :x:",
-                               description=page.strip("```").replace('<', '[').replace('>', ']'),
-                               color=discord.Color.red())
-            await ctx.send(ctx.message.channel, embed=em)
+# to be revised
+#async def send_cmd_help(ctx):
+#    print(ctx.invoked_subcommand)
+#    if ctx.invoked_subcommand:
+#        pages = bot.formatter.format_help_for(ctx, ctx.invoked_subcommand)
+#        page = bot.HelpCommand(ctx, ctx.invoked_subcommand)
+
+#        for page in pages:
+#            em = discord.Embed(title="Missing args :x:",
+#                               description=page.strip("```").replace('<', '[').replace('>', ']'),
+#                               color=discord.Color.red())
+#            await ctx.send(ctx.message.channel, embed=em)
+#    else:
+#        pages = bot.formatter.format_help_for(ctx, ctx.command)
+#        for page in pages:
+#            em = discord.Embed(title="Missing args :x:",
+#                               description=page.strip("```").replace('<', '[').replace('>', ']'),
+#                               color=discord.Color.red())
+#            await ctx.send(ctx.message.channel, embed=em)
 
 @bot.command(pass_context=True, hidden=True)
 @commands.check(checks.is_owner)
@@ -242,9 +246,9 @@ async def on_command_error(ctx, error):
     channel = ctx.channel.send
 
     if isinstance(error, commands.MissingRequiredArgument):
-        await send_cmd_help(ctx)
+        await ctx.send('Missing Arguments')
     elif isinstance(error, commands.BadArgument):
-        await send_cmd_help(ctx)
+        await ctx.send('Bad Argument')
     elif isinstance(error, commands.CommandInvokeError):
         output.error("Exception in command '{}', {}".format(ctx.command.qualified_name, error.original))
         oneliner = "Error in command '{}' - {}: {}\nIf this issue persists, Please report it in the support server.".format(
