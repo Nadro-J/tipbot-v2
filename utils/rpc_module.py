@@ -42,8 +42,9 @@ class Rpc:
                                auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']
 
-    def getinfo(self):
-        payload = json.dumps({"method": "getinfo", "params": [], "jsonrpc": "2.0"})
+    ### work to be done
+    def getbalance(self):
+        payload = json.dumps({"method": "getbalance", "params": [], "jsonrpc": "2.0"})
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
                                 auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']

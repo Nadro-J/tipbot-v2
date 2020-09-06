@@ -15,12 +15,11 @@ class Pull(commands.Cog):
         await self.bot.say("Pulling...")
         try:
             returned = os.system("git pull")
-            await self.bot.say(":+1:Returned code "+ str(returned))
+            await ctx.send(":+1:Returned code "+ str(returned))
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             output.error('{} has attempted to update the bot, but the following '
                          'exception occurred;\n\t->{}'.format(ctx.message.author, exc))
-
 
 def setup(bot):
     bot.add_cog(Pull(bot))

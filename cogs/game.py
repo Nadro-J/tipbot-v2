@@ -108,7 +108,7 @@ class Game(commands.Cog):
 
     @commands.command(pass_context=True)
     async def bet(self, ctx, amount:float):
-        """Donate to a donation account"""
+        """Place a bet on whether o not the number will be EVEN. Between 1, 9999999"""
         snowflake = ctx.message.author.id
         #the betting user is the house
         bet_user = str(self.game_id)

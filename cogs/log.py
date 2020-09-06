@@ -26,7 +26,7 @@ class Log(commands.Cog):
         for line in itertools.islice(text, length - num_lines, length):
             send += line
         send += "```"
-        await self.bot.say(send)
+        await ctx.send(send)
 
 
 def setup(bot):

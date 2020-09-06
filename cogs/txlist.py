@@ -33,7 +33,7 @@ class Txlist(commands.Cog):
         self.embed_color = int(embed_config["color"], 16)
 
 
-    async def do_stake_embed(self, name, db_bal, db_bal_unconfirmed, stake_total_amt, stake_total_received, reg_users_eligible):
+    async def do_stake_embed(self, ctx, name, db_bal, db_bal_unconfirmed, stake_total_amt, stake_total_received, reg_users_eligible):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested the **Staking Balance**", color=self.embed_color)
         embed.set_author(name="{} ADMIN".format(self.bot_name))
@@ -47,11 +47,11 @@ class Txlist(commands.Cog):
         embed.add_field(name="Users Eleigible for Staking Payout", value="{}".format(int(reg_users_eligible)))
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
+            await ctx.send("I need the `Embed links` permission to send this")
 
-    async def do_fee_embed(self, name, db_bal, db_bal_unconfirmed, stake_total):
+    async def do_fee_embed(self, ctx, name, db_bal, db_bal_unconfirmed, stake_total):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested the **Fee Balance**", color=self.embed_color)
         embed.set_author(name="{} ADMIN".format(self.bot_name))
@@ -64,11 +64,11 @@ class Txlist(commands.Cog):
             embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stake_total), 8),self.currency_symbol))
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
+            await ctx.send("I need the `Embed links` permission to send this")
 
-    async def do_donate_embed(self, name, db_bal, db_bal_unconfirmed, stake_total):
+    async def do_donate_embed(self, ctx, name, db_bal, db_bal_unconfirmed, stake_total):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested the **Donate Balance**", color=self.embed_color)
         embed.set_author(name="{} ADMIN".format(self.bot_name))
@@ -81,11 +81,11 @@ class Txlist(commands.Cog):
             embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stake_total), 8),self.currency_symbol))
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
+            await ctx.send("I need the `Embed links` permission to send this")
 
-    async def do_all_embed(self, name, address, request, db_bal, db_bal_unconfirmed, stake_total):
+    async def do_all_embed(self, ctx, name, address, request, db_bal, db_bal_unconfirmed, stake_total):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested the **{}**".format(request), color=self.embed_color)
         embed.set_author(name="{} ADMIN".format(self.bot_name))
@@ -106,7 +106,7 @@ class Txlist(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)
-    async def fees(self):
+    async def fees(self, ctx):
         """Display your balance"""
         # Set important variables
         snowflake = str(self.treasurer)
@@ -115,7 +115,7 @@ class Txlist(commands.Cog):
 
         # Check if user exists in db
         #await self.bot.say("Checking for updated mining balance")
-        #mysql.check_for_updated_mining_balance()
+        mysql.check_for_updated_mining_balance()
         #await self.bot.say("Checking if staking user exists")
         mysql.get_staking_user(snowflake)
 
@@ -130,7 +130,7 @@ class Txlist(commands.Cog):
         stakes =  mysql.get_tip_amounts_from_id(self.stakeflake, snowflake)
 
         # Execute and return SQL Query
-        await self.do_fee_embed(name, balance, balance_unconfirmed, sum(stakes))
+        await self.do_fee_embed(ctx, name, balance, balance_unconfirmed, sum(stakes))
 
     @commands.command(pass_context=True, hidden=True)
     @commands.check(checks.is_owner)
@@ -163,15 +163,13 @@ class Txlist(commands.Cog):
         stake_total_received = []
         for x in stake_tips:
             stake_total_received.append(mysql.get_deposit_amount(x))
-         
+
         # await self.bot.say("total amount received from staking {}".format(sum(stake_total_received)))
 
         # find the total balance that was staked
         # the balance is fetched directly from the wallet using rpc
         # balance is ussually found in using the getinfo command you need to add the balance that is staking in case the wallet is currently staking
-        info = rpc.getinfo()
-        wallet_balance = float(info["balance"]) + float(info["stake"])
-        balance_staked = wallet_balance - float(balance)
+        balance_staked = rpc.getbalance() - float(balance)
         # await self.bot.say("wallet ballance is {} and balance staked is {}".format(wallet_balance, balance_staked))
 
         # get the number of users that will receive this stake
@@ -184,16 +182,16 @@ class Txlist(commands.Cog):
             reg_str = str(users)
             #remove the staking account from the eligible users list
             if reg_str == self.stakeflake:
-                continue   
-
+                continue
             user_bal = mysql.get_balance(reg_str, check_update=True)
+
             if (float(user_bal) >= 0.00001001):
                 # now the reg user list contains those eligible for the stake lets get the length of the list to pass
                 reg_users_eligible.append(reg_str)
         #await self.bot.say("Reg_users_eligible was appended")
 
         # print into the embed object
-        await self.do_stake_embed(name, balance, balance_unconfirmed, stake_total_amt, sum(stake_total_received), len(reg_users_eligible))
+        await self.do_stake_embed(ctx, name, balance, balance_unconfirmed, stake_total_amt, sum(stake_total_received), len(reg_users_eligible))
 
         # if the balance is > 0 continue to pay out
         if balance <= 0:

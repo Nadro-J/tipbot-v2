@@ -108,26 +108,6 @@ async def on_message(message):
                 return 
             await bot.process_commands(message)
 
-# to be revised
-#async def send_cmd_help(ctx):
-#    print(ctx.invoked_subcommand)
-#    if ctx.invoked_subcommand:
-#        pages = bot.formatter.format_help_for(ctx, ctx.invoked_subcommand)
-#        page = bot.HelpCommand(ctx, ctx.invoked_subcommand)
-
-#        for page in pages:
-#            em = discord.Embed(title="Missing args :x:",
-#                               description=page.strip("```").replace('<', '[').replace('>', ']'),
-#                               color=discord.Color.red())
-#            await ctx.send(ctx.message.channel, embed=em)
-#    else:
-#        pages = bot.formatter.format_help_for(ctx, ctx.command)
-#        for page in pages:
-#            em = discord.Embed(title="Missing args :x:",
-#                               description=page.strip("```").replace('<', '[').replace('>', ']'),
-#                               color=discord.Color.red())
-#            await ctx.send(ctx.message.channel, embed=em)
-
 @bot.command(pass_context=True, hidden=True)
 @commands.check(checks.is_owner)
 async def shutdown(ctx):
@@ -240,15 +220,41 @@ async def on_channel_delete(channel):
     Mysql.remove_channel(channel)
     output.info("Channel {0} deleted from {1}".format(channel.name, channel.guild.name))
 
+# to be revised
+async def send_cmd_help(ctx, arg_type, error):
+    command = ctx.message.content.split()[0][1:]
+    try:
+        help = config['handler_msg'][command]
+    except KeyError:
+        help = 'Command not found'
+
+    if 'BadArgument' in str(arg_type):
+        descriptor = 'Bad Argument'
+
+    if 'MissingRequiredArgument' in str(arg_type):
+        descriptor = 'Missing Argument'
+
+    if help != 'Command not found':
+        em = discord.Embed(title=":exclamation: An error has occurred",
+                           description="``{}``".format(arg_type),
+                           color=discord.Color.red())
+        em.add_field(name="Details", value="{}".format(descriptor), inline=True)
+        em.add_field(name="Help", value="{}".format(help), inline=True)
+        await ctx.send(ctx.message.channel, embed=em)
+    else:
+        em = discord.Embed(title=":exclamation: An error has occurred",
+                           description="``Command key not found``",
+                           color=discord.Color.red())
+        await ctx.send(ctx.message.channel, embed=em)
 
 @bot.event
 async def on_command_error(ctx, error):
-    channel = ctx.channel.send
-
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Missing Arguments')
+        await send_cmd_help(ctx, commands.MissingRequiredArgument, error)
+
     elif isinstance(error, commands.BadArgument):
-        await ctx.send('Bad Argument')
+        await send_cmd_help(ctx, commands.BadArgument, error)
+
     elif isinstance(error, commands.CommandInvokeError):
         output.error("Exception in command '{}', {}".format(ctx.command.qualified_name, error.original))
         oneliner = "Error in command '{}' - {}: {}\nIf this issue persists, Please report it in the support server.".format(

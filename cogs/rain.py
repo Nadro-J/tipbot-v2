@@ -28,16 +28,16 @@ class Rain(commands.Cog):
             return
 
         if amount < RAIN_MINIMUM:
-            await self.bot.say("**:warning: Amount {:.8f} {} for rain is less than minimum {} required! :warning:**".format(float(amount), CURRENCY_SYMBOL, float(RAIN_MINIMUM)))
+            await ctx.send("**:warning: Amount {:.8f} {} for rain is less than minimum {} required! :warning:**".format(float(amount), CURRENCY_SYMBOL, float(RAIN_MINIMUM)))
             return
 
-        snowflake = ctx.message.author.id
+        snowflake = str(ctx.message.author.id)
 
         mysql.check_for_user(snowflake)
         balance = mysql.get_balance(snowflake, check_update=True)
 
         if float(balance) < amount:
-            await self.bot.say("{} **:warning:You cannot rain more {} than you have!:warning:**".format(ctx.message.author.mention, CURRENCY_SYMBOL))
+            await ctx.send("{} **:warning:You cannot rain more {} than you have!:warning:**".format(ctx.message.author.mention, CURRENCY_SYMBOL))
             return
 
         # Create tip list
@@ -48,7 +48,7 @@ class Rain(commands.Cog):
 
         #users_list is all members on the server   
         users_list=[]            
-        for user in ctx.message.server.members:
+        for user in ctx.message.guild.members:
             if mysql.check_for_user(user.id) is not None:
                 users_list.append(user)
 
@@ -70,12 +70,12 @@ class Rain(commands.Cog):
             len_receivers = len(active_users)
 
         if len_receivers == 0:
-            await self.bot.say("{}, you are all alone if you don't include bots! Trying raining when people are online and active.".format(ctx.message.author.mention))
+            await ctx.send("{}, you are all alone if you don't include bots! Trying raining when people are online and active.".format(ctx.message.author.mention))
             return
 
         amount_split = math.floor(float(amount) * 1e8 / len_receivers) / 1e8
         if amount_split == 0:
-            await self.bot.say("{} **:warning:{:.8f} {} is not enough to split between {} users:warning:**".format(ctx.message.author.mention, float(amount), CURRENCY_SYMBOL, len_receivers))
+            await ctx.send("{} **:warning:{:.8f} {} is not enough to split between {} users:warning:**".format(ctx.message.author.mention, float(amount), CURRENCY_SYMBOL, len_receivers))
             return    
         
         receivers = []        
@@ -85,17 +85,17 @@ class Rain(commands.Cog):
             mysql.add_tip(snowflake, active_user.id, amount_split)
 
         if len(receivers) == 0:
-            await self.bot.say("{}, you are all alone if you don't include bots! Trying raining when people are online and active.".format(ctx.message.author.mention))
+            await ctx.send("{}, you are all alone if you don't include bots! Trying raining when people are online and active.".format(ctx.message.author.mention))
             return
 
-        await self.bot.say(":cloud_rain: {} **Rained {:.8f} {} on {} users** (Total {:.8f} {}) :cloud_rain:".format(ctx.message.author.mention, float(amount_split), CURRENCY_SYMBOL, len_receivers, float(amount), CURRENCY_SYMBOL))
+        await ctx.send(":cloud_rain: {} **Rained {:.8f} {} on {} users** (Total {:.8f} {}) :cloud_rain:".format(ctx.message.author.mention, float(amount_split), CURRENCY_SYMBOL, len_receivers, float(amount), CURRENCY_SYMBOL))
         users_soaked_msg = []
         idx = 0
         for users in receivers:
             users_soaked_msg.append(users)
             idx += 1
             if (len(users_soaked_msg) >= 25) or (idx == int(len_receivers)):
-                await self.bot.say("{}".format(' '.join(users_soaked_msg)))
+                await ctx.send("{}".format(' '.join(users_soaked_msg)))
                 del users_soaked_msg[:]
                 users_soaked_msg = []
 

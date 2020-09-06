@@ -18,9 +18,9 @@ class Uptime(commands.Cog):
         self.embed_color = int(embed_config["color"], 16)
 
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.check(checks.is_owner)
-    async def uptime(self):
+    async def uptime(self, ctx):
         """
         Get the time the bot has been active [ADMIN ONLY]
         """
@@ -33,9 +33,9 @@ class Uptime(commands.Cog):
         embed.add_field(name="Uptime", value=text)
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
         except discord.HTTPException:
-            await self.bot.say("Current uptime: " + text)
+            await ctx.send("Current uptime: " + text)
 
 
 def setup(bot):

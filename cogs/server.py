@@ -16,11 +16,11 @@ class Server(commands.Cog):
         """
         Enable and disable the soak feature [ADMIN ONLY]
         """
-        mysql.set_soak(ctx.message.server, int(enable))
+        mysql.set_soak(ctx.message.guild, int(enable))
         if enable:
-            await self.bot.say("Ok! Soaking is now enabled! :white_check_mark:")
+            await ctx.send("Ok! Soaking is now enabled! :white_check_mark:")
         else:
-            await self.bot.say("Ok! Soaking is now disabled! :no_entry_sign:")
+            await ctx.send("Ok! Soaking is now disabled! :no_entry_sign:")
 
     @commands.command(pass_context=True)
     @commands.check(checks.in_server)
@@ -28,11 +28,11 @@ class Server(commands.Cog):
         """
         Checks if soak is available on the server
         """
-        result_set = mysql.check_soak(ctx.message.server)
+        result_set = mysql.check_soak(ctx.message.guild)
         if result_set:
-            await self.bot.say("Soaking is enabled! :white_check_mark:")
+            await ctx.send("Soaking is enabled! :white_check_mark:")
         else:
-            await self.bot.say("Soaking is disabled! :no_entry_sign:")
+            await ctx.send("Soaking is disabled! :no_entry_sign:")
 
 
 def setup(bot):

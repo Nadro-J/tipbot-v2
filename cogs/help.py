@@ -16,23 +16,26 @@ class Help(commands.Cog):
         Displays a useful list of commands.
         """
         desc = ""
+        commands = ['tip', 'deposit', 'dlist', 'balance', 'tip','withdraw', 'soak', 'rain', 'bet', 'invite']
 
-        command = self.bot.get_command('help')
-        if command.hidden and not checks.is_owner(ctx):
-            pass
+        for cmd in commands:
+            command = self.bot.get_command(str(cmd))
 
-        if command.aliases:
-            desc += "`{}{}`".format(self.prefix, command.name)+" - {}\nAliases: `{}`\n".format(command.short_doc,
-            ",".join(command.aliases))
-            desc += "\n"
+            if command.hidden and not checks.is_owner(ctx):
+                pass
 
-        elif command.short_doc:
-            desc += "`{}{}`".format(self.prefix, command.name)+" - {}\n".format(command.short_doc)
-            desc += "\n"
+            if command.aliases:
+                desc += "`{}{}`".format(self.prefix, command.name)+" - {}\nAliases: `{}`\n".format(command.short_doc,
+                ",".join(command.aliases))
+                desc += "\n"
 
-        else:
-            desc += "`{}{}`\n".format(self.prefix, command.name)
-            desc += "\n"
+            elif command.short_doc:
+                desc += "`{}{}`".format(self.prefix, command.name)+" - {}\n".format(command.short_doc)
+                desc += "\n"
+
+            else:
+                desc += "`{}{}`\n".format(self.prefix, command.name)
+                desc += "\n"
 
         embed = discord.Embed(description=desc)
         bot_name="{} commands!".format(self.bot_descr)
