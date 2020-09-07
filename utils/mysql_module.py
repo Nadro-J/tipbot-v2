@@ -257,6 +257,7 @@ class Mysql:
             else:
                 if check_update:
                     self.check_for_updated_balance(snowflake)
+
                 result_set = self.get_user(snowflake)
                 if check_unconfirmed:
                     return result_set.get("balance_unconfirmed")
@@ -317,7 +318,7 @@ class Mysql:
                     self.remove_from_balance_unconfirmed(snowflake_cur, amount)
                     self.confirm_deposit(txid)
 
-#staking check
+        #staking check
         def check_for_updated_mining_balance(self):
             """
             Uses RPC to get the latest transactions and updates

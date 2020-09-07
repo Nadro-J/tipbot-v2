@@ -41,11 +41,11 @@ class Help(commands.Cog):
         bot_name="{} commands!".format(self.bot_descr)
         embed.set_author(icon_url=self.bot.user.avatar_url, name=bot_name)
         try:
-            await ctx.send(embed=embed)
+            await ctx.author.send(embed=embed)
             if ctx.message.guild is not None:
-                await self.bot.say("{}, I PMed you some helpful info! Make sure to double check that it is from me!".format(ctx.message.author.mention))
+                await ctx.send("{}, I PMed you some helpful info! Make sure to double check that it is from me!".format(ctx.message.author.mention))
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this")
+            await ctx.send("I need the `Embed links` permission to send this")
 
 
 def setup(bot):
