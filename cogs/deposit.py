@@ -36,12 +36,12 @@ class Deposit(commands.Cog):
         embed=discord.Embed(title="You requested your **Deposit Address**", color=self.embed_color)
         embed.set_author(name="{}".format(self.bot_name))
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
-        embed.add_field(name="User", value="{}".format(user), inline=False)
-        embed.add_field(name="Deposit Address", value="`{}`".format(user_addy), inline=False)
-        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(balance), 8),self.currency_symbol))
+        embed.add_field(name=":man_farmer: User", value=ctx.message.author.mention, inline=True)
+        embed.add_field(name=":moneybag: Balance",value="{:.8f} {}".format(round(float(balance), 8), self.currency_symbol), inline=True)
+        embed.add_field(name=":notepad_spiral: Deposit Address", value="`{}`".format(user_addy), inline=False)
         if float(balance_unconfirmed) != 0.0:
-            embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
-        embed.add_field(name="Deposit Transactions", value="Type $dlist for a list of your deposits.")
+            embed.add_field(name=":red_circle: Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
+        embed.add_field(name=":newspaper: Deposit Transactions", value="Type $dlist for a list of your deposits.")
         embed.set_footer(text=self.footer_text)
         try:
             await ctx.author.send(embed=embed)
@@ -71,6 +71,8 @@ class Deposit(commands.Cog):
     async def dlist(self, ctx):
         """Show a list of your Deposits on this Tip Bot Service. TXID, Amount, and Deposit Status are displayed to easily track deposits."""
         user = ctx.message.author
+        txcounter = 0
+
         # only allow this message to be sent privatly for privacy - send a message to the user in the server.    
         if ctx.message.guild is not None:
             await ctx.send("{}, I PMed you your **Deposit List**! Make sure to double check that it is from me!".format(user.mention))
@@ -80,18 +82,36 @@ class Deposit(commands.Cog):
         if mysql.check_for_user(user.id) is None:
             await ctx.send("User is not found in the database")
             return
+
+        embed = discord.Embed(title="{} {} Deposits".format(self.coin_name, self.currency_symbol), color=self.embed_color)
+
         user_addy = mysql.get_address(user.id)
-        await ctx.author.send("Deposit Address: **{}**".format(user_addy))
+        embed.add_field(name=":notepad_spiral: Deposit Address", value="`{}`".format(user_addy), inline=True)
+
         # Get the list of deposit txns by user.id transactions
         conf_txns = mysql.get_deposit_list_byuser(user.id)
-        await ctx.author.send("Number of Deposits: **{}**".format(len(conf_txns)))
+        embed.add_field(name=":evergreen_tree: Total number of deposits", value=len(conf_txns), inline=True)
+
         # List the transactions
         for txns in conf_txns:
+            txcounter = txcounter + 1
             dep_amount = mysql.get_deposit_amount(txns)
-            await ctx.author.send("TXID: <https://{}{}>".format(self.explorer, str(txns)))
-            await ctx.author.send("Deposit amount {:.8f} {}".format(float(dep_amount), self.currency_symbol))
+            embed.add_field(name=":currency_exchange: TXID #{}".format(txcounter), value="<https://{}{}>".format(self.explorer, str(txns)), inline=False)
+            embed.add_field(name=":moneybag: Deposit amount", value="{:.8f} {}".format(float(dep_amount), self.currency_symbol), inline=True)
+
             dep_status = mysql.get_transaction_status_by_txid(txns)
-            await ctx.author.send("Deposit Status {}".format(dep_status))
+            if dep_status == 'CONFIRMED':
+                embed.add_field(name=":white_check_mark: Deposit status", value="{}".format(dep_status), inline=True)
+            else:
+                embed.add_field(name=":ballot_box_with_check: Deposit status", value="{}".format(dep_status), inline=True)
+
+            # Show a maximum of 5 deposits (limited by Discords 2000 character limitation)
+            if txcounter == 5 or len(conf_txns) == txcounter:
+                break
+
+            embed.add_field(name="\u200b\n", value="\u200b\n", inline=False)
+
+        await ctx.author.send(embed=embed)
 
 
 def setup(bot):

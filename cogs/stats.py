@@ -12,7 +12,7 @@ class Stats(commands.Cog):
         self.thumb_embed = self.embed_config["thumb_embed_url"]
 
     @commands.command()
-    async def stats(self, ctx):
+    async def coingecko(self, ctx):
         """
         Show stats about BitGreen
         """

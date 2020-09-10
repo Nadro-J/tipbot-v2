@@ -48,18 +48,18 @@ class TwitterAuth():
         try:
             if int(user['statuses_count']) > 10:
                 for i in range(0, 10):
-                    if 'retweeted_status' in utility_func.parse2json(timeline[i]):
+                    if 'retweeted_status' in parsing.parse2json(timeline[i]):
                         retweets.append(timeline[i]['retweeted_status']['id'])
                     else:
                         continue
             else:
                 for i in range(0, int(user['statuses_count'])):
-                    if 'retweeted_status' in utility_func.parse2json(timeline[i]):
+                    if 'retweeted_status' in parsing.parse2json(timeline[i]):
                         retweets.append(timeline[i]['retweeted_status']['id'])
                     else:
                         continue
 
-            if int(utility_func.load_json('./config/twitter-config.json')['retweet-id']) in retweets:
+            if int(parsing.load_json('./configs/airdrop/twitter-config.json')['retweet-id']) in retweets:
                 return True
             else:
                 return False

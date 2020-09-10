@@ -1,14 +1,12 @@
 import os
 import json
-#import lib.cron as cron
 import discord
 from datetime import datetime
 from discord.ext import commands
-from utils import parsing, twitter_auth
-from utils import rpc_module
-from utils import cron
+from utils import parsing, twitter_auth, rpc_module, cron, mysql_module
 
-
+rpc = rpc_module.Rpc()
+mysql = mysql_module.Mysql()
 
 class Airdrop_commands(commands.Cog):
 
@@ -35,7 +33,6 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def getinfo(self, ctx):
-        print(self.config['url'])
         embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'])
         embed.set_thumbnail(url=self.config['thumbnail'])
         embed.set_author(name="Blockchain Information", icon_url=self.config['icon'])
@@ -52,11 +49,13 @@ class Airdrop_commands(commands.Cog):
         embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'])
         embed.set_thumbnail(url=self.config['thumbnail'])
         embed.set_author(name="Last transaction", icon_url=self.config['icon'])
-        embed.add_field(name="Category", value=f"{lastWalletTransaction['category']}", inline=True)
-        embed.add_field(name="Confirmations", value=f"{lastWalletTransaction['confirmations']}", inline=True)
-        embed.add_field(name="Transaction ID", value=f"``{lastWalletTransaction['txid']}``", inline=True)
-        embed.add_field(name="Amount", value="{0:.8f}".format(lastWalletTransaction['amount']), inline=True)
-        embed.add_field(name="Fee", value="{0:.8f}".format(lastWalletTransaction['fee']), inline=True)
+        embed.add_field(name=":file_folder: Category", value=f"{lastWalletTransaction['category']}", inline=True)
+        embed.add_field(name=":white_check_mark: Confirmations", value=f"{lastWalletTransaction['confirmations']}", inline=True)
+        embed.add_field(name=":currency_exchange: Transaction ID", value=f"``{lastWalletTransaction['txid']}``", inline=True)
+        embed.add_field(name=":dollar: Amount", value="{0:.8f}".format(lastWalletTransaction['amount']), inline=True)
+        if lastWalletTransaction['category'] == 'send':
+            embed.add_field(name=":paperclip: Fee", value="{0:.8f}".format(lastWalletTransaction['fee']), inline=True)
+        embed.add_field(name=":moneybag: Balance", value="{0:.8f} BITG".format(self.rpc.getbalance()), inline=False)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -68,9 +67,9 @@ class Airdrop_commands(commands.Cog):
         tmp_ids = []
         active_ids = []
 
-        airdropConf = utility.load_json(self.config['airdrop'])                    # currently joined
-        registered_users = utility.load_json(self.config['twitter'])               # authenticated users
-        received = utility.load_json(self.config['sent'])                          # batch complete users
+        airdropConf = parsing.load_json(self.config['airdrop'])                    # currently joined
+        registered_users = parsing.load_json(self.config['twitter'])               # authenticated users
+        received = parsing.load_json(self.config['sent'])                          # batch complete users
 
         if airdropConf['active']:
             airdrop_user_size = airdropConf
@@ -87,7 +86,7 @@ class Airdrop_commands(commands.Cog):
                     await ctx.author.send(embed=embed)
                     return
 
-            if rpc_json.validateaddress(address)['isvalid']:
+            if rpc.validateaddress(address)['isvalid']:
                 # check if the airdrop is twitter-bounty; if not, limit the amount of users that can join.
                 if not airdropConf['twitter-bounty']:
                     if (len(airdrop_user_size['airdrop-users'])) >= airdropConf['max-users']:
@@ -124,7 +123,7 @@ class Airdrop_commands(commands.Cog):
                         tmp_ids.append(id)
                         tmp_twitter.append(registered_users['airdrop-users'][i][id][0]['twitter'][0]['twitter-id'])
 
-                if utility.check_duplicate(str(ctx.message.author.id), airdrop_users_TMPLIST) or utility.check_duplicate(address, airdrop_addrs_TMPLIST):
+                if parsing.check_duplicate(str(ctx.message.author.id), airdrop_users_TMPLIST) or parsing.check_duplicate(address, airdrop_addrs_TMPLIST):
                     if airdropConf['twitter-bounty']:
                         embed = discord.Embed(color=self.color,
                                               title=self.config['title'], url=self.config['url'],
@@ -146,7 +145,7 @@ class Airdrop_commands(commands.Cog):
                         if self.twitter_auth.getUserById(usr_twitter_id) == 63:
                             del (registered_users['airdrop-users'][tmp_ids.index(str(ctx.message.author.id))])
                             update_data = json.dumps(registered_users)
-                            utility.jsonfile(self.config['twitter'], update_data)
+                            parsing.dump_json(self.config['twitter'], update_data)
 
                             embed = discord.Embed(color=self.error,
                                                   title=self.config['title'],
@@ -156,6 +155,7 @@ class Airdrop_commands(commands.Cog):
                             embed.set_author(name="An error has occurred...", icon_url=self.config['icon'])
                             await ctx.author.send(embed=embed)
                         else:
+
                             if registered_users['airdrop-users'][tmp_ids.index(str(ctx.message.author.id))][str(str(ctx.message.author.id))][0]['verified']:
                                 if self.twitter_auth.getFriendship(registered_users['airdrop-users'][tmp_ids.index(str(ctx.message.author.id))][str(str(ctx.message.author.id))][0]['twitter'][0]['twitter-id'], self.twitter['screen-name']):
                                     if airdropConf['twitter-bounty']:
@@ -164,7 +164,7 @@ class Airdrop_commands(commands.Cog):
                                             # public airdrop
                                             airdropConf['airdrop-users'].append(({'discord-id': str(ctx.message.author.id), 'address': address}))
                                             update_data = json.dumps(airdropConf)
-                                            utility.jsonfile(self.config['airdrop'], update_data)                                                                             # '<https://twitter.com/%s/status/%s>' % (self.twitter['screen-name'], self.twitter['retweet-id'])
+                                            parsing.dump_json(self.config['airdrop'], update_data) # '<https://twitter.com/%s/status/%s>' % (self.twitter['screen-name'], self.twitter['retweet-id'])
                                             embed = discord.Embed(color=self.color,
                                                                   title=self.config['title'], url=self.config['url'],
                                                                   description=f"<@{ctx.message.author.id}> has joined the bounty airdrop to receive **{airdropConf['amount']}** {self.wallet['ticker']}. Coins are sent in batches (see below for next batch payout).",
@@ -192,7 +192,7 @@ class Airdrop_commands(commands.Cog):
                                         # non-twitter bounty
                                         airdropConf['airdrop-users'].append(({'discord-id': str(ctx.message.author.id), 'address': address}))
                                         update_data = json.dumps(airdropConf)
-                                        utility.jsonfile(self.config['airdrop'], update_data)
+                                        parsing.load_json(self.config['airdrop'], update_data)
                                         embed = discord.Embed(color=self.color,
                                                               title=self.config['title'],
                                                               url=self.config['url'],
@@ -298,7 +298,7 @@ class Airdrop_commands(commands.Cog):
 
                             for user in airdrop_config['airdrop-users']:
                                 if len(airdrop_config['airdrop-users']) > 0:
-                                    rpc_json.addParticipant(user['address'], airdrop_config['amount'])
+                                    rpc.addParticipant(user['address'], airdrop_config['amount'])
 
                             # TWITTER_BOUNTY = TRUE
                             # end accordingly...
@@ -324,8 +324,8 @@ class Airdrop_commands(commands.Cog):
                             # send coins to those that have already joined before ending.
                             # auto_recv + airdrop_config['airdrop-users'] = total received
                             else:
-                                rpc_json.sendCoins()
-                                rpc_json.clearRecipients()
+                                rpc.sendCoins()
+                                rpc.clearRecipients()
 
                                 cron.disable_batch_airdrop()
                                 embed = discord.Embed(color=self.color, timestamp=datetime.utcnow())
@@ -345,7 +345,7 @@ class Airdrop_commands(commands.Cog):
                                 parsing.dump_json(self.config['airdrop'], make_airdrop)
 
                         # Not enough transactions
-                        elif rpc_json.txConfirmation() < self.wallet['confirmations']:
+                        elif rpc.lastWalletTx()['confirmations'] < self.wallet['confirmations']:
                             embed = discord.Embed(color=self.error,
                                                   title=self.config['title'],
                                                   url=self.config['url'],
@@ -394,7 +394,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def airdrop(self, ctx, participants, cAmount, twitter_bounty: int=0):
-        if not utility.load_json(self.config['airdrop'])['active']:
+        if not parsing.load_json(self.config['airdrop'])['active']:
             try:
                 # convert arguments to int, float
                 participants = int(participants)
@@ -466,25 +466,31 @@ class Airdrop_commands(commands.Cog):
         if os.path.isfile(self.config['airdrop']):
             with open(self.config['airdrop']) as file:
                 data = json.load(file)
-
-                if rpc_json.txConfirmation() >= self.wallet['confirmations']:
+                if rpc.lastWalletTx()['confirmations'] >= self.wallet['confirmations']:
                     if data['active'] and len(data['airdrop-users']) > 0 or data['twitter-bounty']:
                         for user in data['airdrop-users']:
                             if len(data['airdrop-users']) == 0:
                                 break
                             else:
-                                rpc_json.addParticipant(user['address'], data['amount'])
-
+                                rpc.addParticipant(user['address'], data['amount'])
                         if len(data['airdrop-users']) == 0 and data['twitter-bounty']:
                             return
                         else:
-                            rpc_json.sendCoins()
-                            rpc_json.clearRecipients()
+                            total_sent = data['amount'] * len(rpc.recipients)
+
+                            # send transaction
+                            rpc.sendmany()
+                            rpc.clearRecipients()
+
+                            # Account set to 100000000000000010 for testing, to be changed when in production
+                            # Reflect balance on SQL DB
+                            mysql.remove_from_balance('100000000000000010', total_sent)
+                            mysql.add_withdrawal('100000000000000010', total_sent, rpc.lastWalletTx()['txid'])
 
                         if data['twitter-bounty']:
                             remake_JSON = {'sent': []}
                             indent_JSON = json.dumps(remake_JSON, indent=4)
-                            utility.jsonfile(self.config['sent'], indent_JSON)
+                            parsing.dump_json(self.config['sent'], indent_JSON)
 
                             cron.disable_batch_airdrop()
                             embed = discord.Embed(color=self.color, timestamp=datetime.utcnow())
@@ -504,7 +510,7 @@ class Airdrop_commands(commands.Cog):
 
                         remake_airdrop = {'airdrop-users': [], 'max-users': 0, 'amount': 0, 'active': False,'twitter-bounty': False}
                         make_json = json.dumps(remake_airdrop, indent=4)
-                        utility.jsonfile(self.config['airdrop'], make_json)
+                        parsing.dump_json(self.config['airdrop'], make_json)
 
                     elif data['active'] and len(data['airdrop-users']) == 0:
                         embed = discord.Embed(color=self.color,
@@ -516,7 +522,7 @@ class Airdrop_commands(commands.Cog):
                         embed.add_field(name="details", value="Either an airdrop isn't active or not one has joined yet.", inline=True)
                         await self.bot.send_message(ctx.message.channel, embed=embed)
 
-                elif rpc_json.txConfirmation() < self.wallet['confirmations']:
+                elif rpc.lastWalletTx()['confirmations'] < self.wallet['confirmations']:
                     embed = discord.Embed(color=self.error,
                                           title=self.config['title'],
                                           url=self.config['url'],
@@ -524,8 +530,8 @@ class Airdrop_commands(commands.Cog):
                                           timestamp=datetime.utcnow())
                     embed.set_thumbnail(url=self.config['thumbnail'])
                     embed.add_field(name="required", value=f"{self.wallet['confirmations']}", inline=True)
-                    embed.add_field(name="confirmations", value=f"{rpc_json.txConfirmation()}", inline=True)
-                    embed.add_field(name="transaction id", value=f"``{rpc_json.txId()}``", inline=False)
+                    embed.add_field(name="confirmations", value=f"{rpc.lastWalletTx()['confirmations']}", inline=True)
+                    embed.add_field(name="transaction id", value=f"``{rpc.lastWalletTx()['txid']}``", inline=False)
                     await self.channel.send(embed=embed)
 
     @commands.command()
@@ -552,7 +558,7 @@ class Airdrop_commands(commands.Cog):
     async def set_retweet(self,ctx, id: str):
         self.twitter['retweet-id'] = id
         update_config = json.dumps(self.twitter)
-        utility.jsonfile(self.twitter['self_path'], update_config)
+        parsing.load_json(self.twitter['self_path'], update_config)
 
         embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'], timestamp=datetime.utcnow())
         embed.set_thumbnail(url=self.config['thumbnail'])

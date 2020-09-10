@@ -17,7 +17,6 @@ class Uptime(commands.Cog):
         self.footer_text = embed_config["footer_msg_text"]
         self.embed_color = int(embed_config["color"], 16)
 
-
     @commands.command()
     @commands.check(checks.is_owner)
     async def uptime(self, ctx):
@@ -36,7 +35,6 @@ class Uptime(commands.Cog):
             await ctx.send(embed=embed)
         except discord.HTTPException:
             await ctx.send("Current uptime: " + text)
-
 
 def setup(bot):
     bot.add_cog(Uptime(bot))

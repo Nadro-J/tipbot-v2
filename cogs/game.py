@@ -113,9 +113,10 @@ class Game(commands.Cog):
         #the betting user is the house
         bet_user = str(self.game_id)
         #check if amount is negative and return error to user in chat
-        if amount <= 0.0:
-            await ctx.send("{} **:warning:You cannot bet <= 0!:warning:**".format(ctx.message.author.mention))
+        if amount <= 0.0 or float('{:.8f}'.format(amount)) == 0.00000000:
+            await ctx.send("{} **:warning:You cannot bet <= 0 or with a decimal value that has more than 8 leading zeros!:warning:**".format(ctx.message.author.mention))
             return
+
         #check if receiver is in database
 
         balance = mysql.get_balance(str(snowflake), check_update=True)
@@ -129,17 +130,19 @@ class Game(commands.Cog):
                 secret_number = random.randint(1,9999999)
                 if secret_number % 2 == 0 and secret_number != 0:
                     bet_user_bal = mysql.get_balance(self.game_id, check_update=True)
+
                     if float(bet_user_bal) >= amount:
                         mysql.add_tip(bet_user, str(snowflake), amount)
-                        await ctx.send("{} **EVEN NUMBER! {} You WIN {} {}! :tada:**".format(ctx.message.author.mention, secret_number, str(amount), self.currency_symbol))
+                        await ctx.send("{0} **EVEN NUMBER! {1} You WIN {2:.8f} {3}! :tada:**".format(ctx.message.author.mention, secret_number, amount, self.currency_symbol))
+
                     else:
-                        await ctx.send("{} **EVEN NUMBER! {} You WIN {} {}!** BUT THE BOT DOES NOT HAVE ENOUGH FUNDS TO PAY YOU".format(ctx.message.author.mention, secret_number, str(amount), self.currency_symbol))
+                        await ctx.send("{0} **EVEN NUMBER! {1} You WIN {2:.8f} {3}!** BUT THE BOT DOES NOT HAVE ENOUGH FUNDS TO PAY YOU".format(ctx.message.author.mention, secret_number, str(amount), self.currency_symbol))
                 else:
                     mysql.add_tip(str(snowflake), bet_user, amount)
-                    await ctx.send("{} **ODD NUMBER! {} You LOSE {} {}!** You should try again.".format(ctx.message.author.mention, secret_number, str(amount), self.currency_symbol))
+                    await ctx.send("{0} **ODD NUMBER! {1} You LOSE {2:.8f} {3}!** You should try again.".format(ctx.message.author.mention, secret_number, amount, self.currency_symbol))
             else:
                 mysql.add_tip(str(snowflake), bet_user, amount)
-                await ctx.send("{} **ODD NUMBER! {} You LOSE {} {}!** You should try again.".format(ctx.message.author.mention, secret_number, str(amount), self.currency_symbol))
+                await ctx.send("{0} **ODD NUMBER! {1} You LOSE {2:.8f} {3}!** You should try again.".format(ctx.message.author.mention, secret_number, amount, self.currency_symbol))
 
 def setup(bot):
     bot.add_cog(Game(bot))

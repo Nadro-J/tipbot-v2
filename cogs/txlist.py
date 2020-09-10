@@ -10,7 +10,6 @@ from utils import rpc_module, mysql_module, parsing, checks
 rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
-
 class Txlist(commands.Cog):
 
     def __init__(self, bot):
@@ -31,7 +30,6 @@ class Txlist(commands.Cog):
         self.thumb_embed = embed_config["thumb_embed_url"]
         self.footer_text = embed_config["footer_msg_text"]
         self.embed_color = int(embed_config["color"], 16)
-
 
     async def do_stake_embed(self, ctx, name, db_bal, db_bal_unconfirmed, stake_total_amt, stake_total_received, reg_users_eligible):
         # Simple embed function for displaying username and balance
@@ -102,7 +100,6 @@ class Txlist(commands.Cog):
             await self.bot.say(embed=embed)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission to send this")
-
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)
@@ -227,8 +224,6 @@ class Txlist(commands.Cog):
         if balance_stake > 0.0:
             mysql.add_tip(snowflake, self.treasurer, balance_stake)
             # await self.bot.say("Staking Payouts **Sent {:.8f} {} to Fees! :moneybag:**".format(balance_stake, self.currency_symbol))
-                            
-                    
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)

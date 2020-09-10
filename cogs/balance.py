@@ -10,7 +10,6 @@ from utils import rpc_module, mysql_module, parsing, checks
 rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
 
-
 class Balance(commands.Cog):
 
     def __init__(self, bot):
@@ -41,7 +40,6 @@ class Balance(commands.Cog):
 
         # get the users staking rewards
         stakes = mysql.get_tip_amounts_from_id(self.stake_id, str(snowflake))
-
         # get the users donated amount
         donations = mysql.get_tip_amounts_from_id(str(snowflake), self.donate)
         # Execute and return SQL Query
@@ -49,15 +47,16 @@ class Balance(commands.Cog):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested your **Balance**", color=self.embed_color)
         embed.set_author(name=self.bot_name)
-        embed.add_field(name="User", value=ctx.message.author.mention, inline=False)
-        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(balance), 8),self.currency_symbol))
+        embed.add_field(name=":man_farmer: User", value=ctx.message.author.mention, inline=True)
+        embed.add_field(name=":moneybag: Balance", value="{:.8f} {}".format(round(float(balance), 8),self.currency_symbol), inline=True)
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
+
         if float(balance_unconfirmed) != 0.0:
-            embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
+            embed.add_field(name=":heavy_check_mark: Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8), self.currency_symbol), inline=False)
         if float(sum(stakes)) != 0.0:
-            embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stakes), 8),self.currency_symbol))
+            embed.add_field(name=":cut_of_meat: Total Staking rewards", value="{:.8f} {}".format(round(float(stakes), 8), self.currency_symbol), inline=False)
         if float(sum(donations)) != 0.0:
-            embed.add_field(name="Your Total Donations", value="{:.8f} {}".format(round(float(donations), 8),self.currency_symbol))
+            embed.add_field(name=":dollar: Total Donations sent", value="{:.8f} {}".format(round(float(sum(donations)), 8), self.currency_symbol), inline=False)
         embed.set_footer(text=self.footer_text)
         try:
             await ctx.author.send(embed=embed)

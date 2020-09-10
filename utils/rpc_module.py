@@ -25,6 +25,19 @@ class Rpc:
         '''
         self.recipients.clear()
 
+    def total_recipients(self):
+        return len(self.recipients)
+
+    def sendmany(self):
+        '''
+        Send from airdrop wallet specified in config.json
+        '''
+
+        payload = json.dumps({"method": "sendmany", "params": ['', self.recipients, 16], "jsonrpc": "2.0"})
+        response = requests.post(self.serverURL, headers=self.headers, data=payload,
+                                auth=(self.rpc_user, self.rpc_pass))
+        return response.json()['result']
+
     def getinfo(self):
         payload = json.dumps({"method": "getblockchaininfo", "params": [], "jsonrpc": "2.0"})
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
@@ -85,12 +98,6 @@ class Rpc:
 
     def sendtoaddress(self, address, amount):
         payload = json.dumps({"method": "sendtoaddress", "params": [address, "%.2f" % round(amount, 4)], "jsonrpc": "2.0"})
-        response = requests.post(self.serverURL, headers=self.headers, data=payload,
-                                auth=(self.rpc_user, self.rpc_pass))
-        return response.json()['result']
-
-    def sendmany(self):
-        payload = json.dumps({"method": "sendmany", "params": [self.recipients], "jsonrpc": "2.0"})
         response = requests.post(self.serverURL, headers=self.headers, data=payload,
                                 auth=(self.rpc_user, self.rpc_pass))
         return response.json()['result']

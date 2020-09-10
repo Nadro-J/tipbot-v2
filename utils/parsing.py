@@ -14,6 +14,15 @@ def load_json(path):
         with open(path) as f:
             return json.load(f)
 
+def parse2json(data):
+    return json.dumps(data, indent=4)
+
+def check_duplicate(item, list):
+    if item in list:
+        return True
+    else:
+        return False
+
 def parse_json(filename):
     """ remove //-- and /* -- */ style comments from JSON """
     comment_re = re.compile('(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?', re.DOTALL | re.MULTILINE)

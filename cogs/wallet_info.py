@@ -25,7 +25,6 @@ class Wallet(commands.Cog):
         self.thumb_embed = embed_config["thumb_embed_url"]
         self.footer_text = embed_config["footer_msg_text"]
         self.embed_color = int(embed_config["color"], 16)
- 
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)
@@ -76,7 +75,6 @@ class Wallet(commands.Cog):
             await self.bot.say(embed=embed)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission to send this")
-
 
     # ban a server 
     @commands.command(hidden=True)

@@ -31,7 +31,6 @@ class Soak(commands.Cog):
     @commands.check(checks.allow_soak)
     async def soak(self, ctx, amount: float, role_id=""):
         """Tip all online users"""
-        print ("ahhh")
         if self.use_max_recipients and self.soak_max_recipients == 0:
             await ctx.send("**:warning: max users for soak is set to 0! Talk to the config owner. :warning:**")
             return
@@ -48,8 +47,6 @@ class Soak(commands.Cog):
         if float(balance) < amount:
             await ctx.send("{} **:warning:You cannot soak more {} than you have!:warning:**".format(ctx.message.author.mention, self.currency_symbol))
             return
-
-        print ("aaaa")
 
         users_list=[]
         if role_id=="" or role_id=="@verified" or role_id=="@here" or role_id=="all":
