@@ -1,5 +1,55 @@
 # BitGreen Tipbot
 
+
+### TODO
+
+- [X] Airdrop -> Tipbot merge - _(prefix=$)_
+    - [ ] Airdrop commands tested
+      - [ ] **user** commands tested
+        - [ ] getinfo
+        - [ ] join
+        - [ ] cmd
+      - [ ] **admin** commands tested
+        - [ ] stats
+        - [ ] end
+        - [ ] airdrop
+        - [ ] send
+        - [ ] set_retweet
+        - [ ] lasttx
+  - [ ] Twitter commands tested
+    - [ ] Twitter **user** commands tested
+      - [ ] register_airdrop
+      - [ ] verify
+    - [ ] Twitter **admin** commands tested
+      - [ ] dfa_stats
+  - [ ] CronJob commands tested
+    - [ ] CronJob **admin** commands tested
+      - [ ] setup_batch_cron
+      - [ ] enable_batch_airdrop
+      - [ ] disable_batch_airdrop
+  
+- [x] Upgrade to Discord v1.0
+  - [x] TipBot **user** commands tested
+    - [x] tip
+    - [x] deposit
+      - [X] dlist
+    - [x] withdraw
+      - [x] wlist
+    - [x] rain
+    - [x] soak
+    - [x] bet
+    - [x] coingecko
+    - [ ] invite
+  - [x] TipBot **admin** commands tested
+    - [x] wallet
+    - [x] uptime
+    - [ ] checksoak
+    - [ ] allowsoak
+    - [ ] log
+    - [ ] pull
+    
+    
+
 # Requirements
 * discord.py installed
 * Python 3.6+
