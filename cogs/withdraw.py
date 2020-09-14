@@ -87,7 +87,7 @@ class Withdraw(commands.Cog):
             embed.add_field(name=":notepad_spiral: Withdrawal Address", value="{}".format(address), inline=False)
             embed.add_field(name=":dollar: Withdraw Amount", value="{:.8f} {}".format(float(amount), self.currency_symbol), inline=True)
             embed.add_field(name=":paperclip: Fee", value="{:.8f} {}".format(float(botfee), self.currency_symbol), inline=False)
-            embed.add_field(name="Withdrawal Transac6tions", value="Type $wlist for a list of your deposits.")
+            embed.add_field(name="Withdrawal Transactions", value="Type $wlist for a list of your deposits.")
             embed.set_footer(text=self.footer_text)
             try:
                 await ctx.author.send(embed=embed)
