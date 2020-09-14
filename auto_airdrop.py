@@ -22,15 +22,14 @@ class task():
         batch_log.write(f'[{datetime.now()}] - Batch airdrop complete!\n')
 
     def batch_airdrop(self):
-        if self.airdropConf['twitter-bounty']:
-            for user in self.airdropConf['airdrop-users']:
-                self.sent['sent'].append(user)
+            if self.airdropConf['active'] and self.airdropConf['twitter-bounty']:
+                for user in self.airdropConf['airdrop-users']:
+                    self.sent['sent'].append(user)
 
-            # "[1:]" added to remove . <- period from filepath
-            update_sent = json.dumps(self.sent)
-            parsing.dump_json(self.relative_path + self.config['sent'][1:], update_sent)
+                # "[1:]" added to remove . <- period from filepath
+                update_sent = json.dumps(self.sent)
+                parsing.dump_json(self.relative_path + self.config['sent'][1:], update_sent)
 
-            if self.airdropConf['active']:
                 if rpc.lastWalletTx()['confirmations'] >= self.wallet['confirmations']:
                     for user in self.airdropConf['airdrop-users']:
                         if len(self.airdropConf['airdrop-users']) == 0:
