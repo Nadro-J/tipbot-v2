@@ -70,8 +70,8 @@ class Txlist(commands.Cog):
         # Simple embed function for displaying username and balance
         embed=discord.Embed(title="You requested the **Donate Balance**", color=self.embed_color)
         embed.set_author(name="{} ADMIN".format(self.bot_name))
-        embed.add_field(name="User", value=name, inline=False)
-        embed.add_field(name="Balance", value="{:.8f} {}".format(round(float(db_bal), 8),self.currency_symbol))
+        embed.add_field(name=":man_farmer: User", value=name, inline=False)
+        embed.add_field(name=":moneybag: Balance", value="{:.8f} {}".format(round(float(db_bal), 8),self.currency_symbol))
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
         if float(db_bal_unconfirmed) != 0.0:
             embed.add_field(name="Unconfirmed Deposits", value="{:.8f} {}".format(round(float(db_bal_unconfirmed), 8),self.currency_symbol))
@@ -97,7 +97,7 @@ class Txlist(commands.Cog):
             embed.add_field(name="Your Total Staking Rewards", value="{:.8f} {}".format(round(float(stake_total), 8),self.currency_symbol))
         embed.set_footer(text=self.footer_text)
         try:
-            await self.bot.say(embed=embed)
+            await ctx.send(embed=embed)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission to send this")
 
@@ -105,6 +105,9 @@ class Txlist(commands.Cog):
     @commands.check(checks.is_owner)
     async def fees(self, ctx):
         """Display your balance"""
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         # Set important variables
         snowflake = str(self.treasurer)
         #await self.bot.say("Staking account snowflake: {}".format(snowflake))
@@ -132,6 +135,9 @@ class Txlist(commands.Cog):
     @commands.command(pass_context=True, hidden=True)
     @commands.check(checks.is_owner)
     async def stake(self, ctx):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         # Set important variables
         snowflake = str(self.stakeflake)
         # await self.bot.say("Staking account snowflake: {}".format(snowflake))
@@ -227,7 +233,9 @@ class Txlist(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)
-    async def donations(self):
+    async def donations(self, ctx):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
         # Set important variables
         snowflake = str(self.donate)
         #await self.bot.say("Staking account snowflake: {}".format(snowflake))
@@ -250,11 +258,14 @@ class Txlist(commands.Cog):
         stakes =  mysql.get_tip_amounts_from_id(self.stakeflake, snowflake)
 
         # Execute and return SQL Query
-        await self.do_donate_embed(name, balance, balance_unconfirmed, sum(stakes))
+        await self.do_donate_embed(ctx, name, balance, balance_unconfirmed, sum(stakes))
 
     @commands.command(hidden=True)
     @commands.check(checks.is_owner)
-    async def gamebal(self):
+    async def gamebal(self, ctx):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         # Set important variables
         snowflake = str(self.game_id)
         #await self.bot.say("Staking account snowflake: {}".format(snowflake))
@@ -281,7 +292,7 @@ class Txlist(commands.Cog):
         stakes =  mysql.get_tip_amounts_from_id(self.stakeflake, snowflake)
 
         # Execute and return SQL Query
-        await self.do_all_embed(name, address, request, balance, balance_unconfirmed, sum(stakes))
+        await self.do_all_embed(ctx, name, address, request, balance, balance_unconfirmed, sum(stakes))
 
 def setup(bot):
     bot.add_cog(Txlist(bot))

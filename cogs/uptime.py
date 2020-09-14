@@ -23,6 +23,9 @@ class Uptime(commands.Cog):
         """
         Get the time the bot has been active [ADMIN ONLY]
         """
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         current_time = time.time()
         difference = int(round(current_time - start_time))
         text = str(datetime.timedelta(seconds=difference))

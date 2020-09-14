@@ -317,6 +317,7 @@ class Mysql:
                     self.add_to_balance(snowflake_cur, amount)
                     self.remove_from_balance_unconfirmed(snowflake_cur, amount)
                     self.confirm_deposit(txid)
+                    self.confirm_withdrawal(txid)
 
         #staking check
         def check_for_updated_mining_balance(self):
@@ -612,7 +613,7 @@ class Mysql:
             #database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT amount, txid FROM deposit WHERE status = %s"
+            to_exec = "SELECT amount, txid FROM deposit WHERE status = %s ORDER BY timestamp DESC"
             cursor.execute(to_exec, str(status))
             deposits = cursor.fetchall()
             cursor.close()

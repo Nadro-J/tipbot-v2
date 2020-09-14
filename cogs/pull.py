@@ -12,6 +12,9 @@ class Pull(commands.Cog):
         """
         Update the bot [ADMIN ONLY]
         """
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         await self.bot.say("Pulling...")
         try:
             returned = os.system("git pull")

@@ -23,6 +23,9 @@ class Rain(commands.Cog):
         USE_MAX_RECIPIENTS = rain_config['use_max_recipients']
         MAX_RECIPIENTS = rain_config['max_recipients']        
 
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         message = ctx.message
         if helpers.is_private_dm(self.bot, message.channel):
             return

@@ -31,6 +31,9 @@ class Soak(commands.Cog):
     @commands.check(checks.allow_soak)
     async def soak(self, ctx, amount: float, role_id=""):
         """Tip all online users"""
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         if self.use_max_recipients and self.soak_max_recipients == 0:
             await ctx.send("**:warning: max users for soak is set to 0! Talk to the config owner. :warning:**")
             return
@@ -142,6 +145,9 @@ class Soak(commands.Cog):
     @commands.command()
     async def soak_info(self, ctx):
         """Display min soak amount and maximum soak recipients"""
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         if self.use_max_recipients:
             st_max_users = str(self.soak_max_recipients)
         else:

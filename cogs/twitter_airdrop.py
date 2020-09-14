@@ -33,6 +33,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def getinfo(self, ctx):
+        await ctx.message.delete()
         embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'])
         embed.set_thumbnail(url=self.config['thumbnail'])
         embed.set_author(name="Blockchain Information", icon_url=self.config['icon'])
@@ -45,6 +46,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def lasttx(self, ctx):
+        await ctx.message.delete()
         lastWalletTransaction = self.rpc.lastWalletTx()
         embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'])
         embed.set_thumbnail(url=self.config['thumbnail'])
@@ -60,6 +62,7 @@ class Airdrop_commands(commands.Cog):
 
     @commands.command()
     async def join(self, ctx, address):
+        await ctx.message.delete()
         # temporary storage point(s)
         airdrop_users_TMPLIST = []
         airdrop_addrs_TMPLIST = []
@@ -261,6 +264,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def stats(self, ctx):
+        await ctx.message.delete()
         airdropConf = parsing.load_json(self.config['airdrop'])
         users_recvd = parsing.load_json(self.config['sent'])
 
@@ -279,6 +283,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def end(self, ctx, failsafe):
+        await ctx.message.delete()
         # If persistent; end differently [check if users are still to be sent in the batch, send anyways regardless of the next batch (if ended).]
 
         if os.path.isfile(self.config['airdrop']):
@@ -394,6 +399,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def airdrop(self, ctx, participants, cAmount, twitter_bounty: int=0):
+        await ctx.message.delete()
         if not parsing.load_json(self.config['airdrop'])['active']:
             try:
                 # convert arguments to int, float
@@ -463,6 +469,7 @@ class Airdrop_commands(commands.Cog):
     @commands.cooldown(1, 150)
     @commands.has_any_role(*roles)
     async def send(self, ctx):
+        await ctx.message.delete()
         if os.path.isfile(self.config['airdrop']):
             with open(self.config['airdrop']) as file:
                 data = json.load(file)
@@ -535,8 +542,10 @@ class Airdrop_commands(commands.Cog):
                     await self.channel.send(embed=embed)
 
     @commands.command()
+    @commands.cooldown(1, 150)
     @commands.has_any_role(*roles)
     async def cmd(self, ctx):
+        await ctx.message.delete()
         embed1 = discord.Embed(color=self.color)
         embed2 = discord.Embed(color=self.color)
 
@@ -556,6 +565,7 @@ class Airdrop_commands(commands.Cog):
     @commands.command()
     @commands.has_any_role(*roles)
     async def set_retweet(self,ctx, id: str):
+        await ctx.message.delete()
         self.twitter['retweet-id'] = id
         update_config = json.dumps(self.twitter)
         parsing.load_json(self.twitter['self_path'], update_config)
@@ -566,6 +576,7 @@ class Airdrop_commands(commands.Cog):
         embed.add_field(name="complete!", value="retweet-id has now been updated", inline=True)
         await ctx.send(embed=embed)
 
+    ## To be deprecated and replaced with $wallet
     @commands.command()
     @commands.has_any_role(*roles)
     async def getbalance(self, ctx):

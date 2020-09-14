@@ -30,9 +30,11 @@ class Deposit(commands.Cog):
         snowflake = ctx.message.author.id
         balance = mysql.get_balance(str(snowflake), check_update=True)
         balance_unconfirmed = mysql.get_balance(snowflake, check_unconfirmed = True)
+
         # Check if user exists in db
         mysql.check_for_user(user.id)
         user_addy = mysql.get_address(user.id)
+
         embed=discord.Embed(title="You requested your **Deposit Address**", color=self.embed_color)
         embed.set_author(name="{}".format(self.bot_name))
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
@@ -45,27 +47,13 @@ class Deposit(commands.Cog):
         embed.set_footer(text=self.footer_text)
         try:
             await ctx.author.send(embed=embed)
+
         except discord.HTTPException:
             await ctx.send("I need the `Embed links` permission to send this")
 
         if ctx.message.guild is not None:
+            await ctx.message.delete()
             await ctx.send("{}, I PMed you your **Deposit Address**! Make sure to double check that it is from me!".format(user.mention))
-
-#    @commands.command(pass_context=True)
-#    async def mobile(self, ctx):
-#        """Show Your Deposit Address on this Tip Bot Service. Use the address to send coins to your account on this Tip Bot.  Formatted for easy copying on Mobile."""
-#        user = ctx.message.author
-        # Check if user exists in db
-        # mysql.check_for_user(user.id)
-#        if mysql.check_for_user(snowflake) is None:
-#            return
-#        user_addy = mysql.get_address(user.id)
-
-#        await self.bot.send_message(ctx.message.author, "Your {} ({}) Deposit Address: \n".format(self.coin_name, self.currency_symbol))
-#        await self.bot.send_message(ctx.message.author, "**{}**".format(user_addy))
-
-#        if ctx.message.server is not None:
-#            await self.bot.say("{}, I PMed you your **Deposit Address**! Make sure to double check that it is from me!".format(user.mention))
 
     @commands.command()
     async def dlist(self, ctx):
@@ -75,7 +63,9 @@ class Deposit(commands.Cog):
 
         # only allow this message to be sent privatly for privacy - send a message to the user in the server.    
         if ctx.message.guild is not None:
+            await ctx.message.delete()
             await ctx.send("{}, I PMed you your **Deposit List**! Make sure to double check that it is from me!".format(user.mention))
+
         # begin sending pm transaction list to user
         await ctx.author.send("{} You requested Your **{} ({}) Deposits**: \n".format(user.mention, self.coin_name, self.currency_symbol))
         # Check if user exists in db

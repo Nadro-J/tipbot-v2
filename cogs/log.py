@@ -15,6 +15,9 @@ class Log(commands.Cog):
         """
         Display the last couple lines of the log [ADMIN ONLY]
         """
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         with open(config["file"], "r") as f:
             text = f.readlines()
         length = len(text)

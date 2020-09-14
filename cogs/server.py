@@ -16,6 +16,9 @@ class Server(commands.Cog):
         """
         Enable and disable the soak feature [ADMIN ONLY]
         """
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         mysql.set_soak(ctx.message.guild, int(enable))
         if enable:
             await ctx.send("Ok! Soaking is now enabled! :white_check_mark:")
@@ -28,6 +31,9 @@ class Server(commands.Cog):
         """
         Checks if soak is available on the server
         """
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+            
         result_set = mysql.check_soak(ctx.message.guild)
         if result_set:
             await ctx.send("Soaking is enabled! :white_check_mark:")

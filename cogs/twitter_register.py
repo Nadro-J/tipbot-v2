@@ -45,7 +45,7 @@ class Twitter_commands(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def register(self, ctx, handle: str):
+    async def register_airdrop(self, ctx, handle: str):
         registered_users = parsing.load_json(self.config['twitter'])
         uuid_2fa = uuid.uuid4().hex
         tmp_twitter = []
@@ -173,8 +173,8 @@ class Twitter_commands(commands.Cog):
         await ctx.send(embed=embed)
 
     # ___- Individual command error handling -___
-    @register.error
-    async def register_error(self, ctx, error):
+    @register_airdrop.error
+    async def register_airdrop_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             embed = discord.Embed(color=self.error)
             embed.set_thumbnail(url=self.config['thumbnail'])

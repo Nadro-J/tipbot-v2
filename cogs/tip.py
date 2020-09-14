@@ -24,8 +24,11 @@ class Tip(commands.Cog):
     async def tip(self, ctx, amount:float, *args: discord.Member):
         """Tip users coins. You can tip multiple users"""
         snowflake = ctx.message.author.id
-
         users=list(set(args))
+
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         for user in users:
 
             tip_user = user.id
@@ -56,8 +59,11 @@ class Tip(commands.Cog):
     async def donate(self, ctx, amount:float):
         """Donate to a donation account"""
         snowflake = ctx.message.author.id
-
         tip_user = str(self.donation_id)
+
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         #check if sender is trying to send to themselves and return error to user in chat
         if snowflake == tip_user:
             await ctx.send("{} **:warning:You cannot donate to yourself!:warning:**".format(ctx.message.author.mention))

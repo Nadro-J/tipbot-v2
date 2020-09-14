@@ -1,4 +1,5 @@
 import re, json, os
+from datetime import datetime
 
 def dump_json(filename, data):
     try:
@@ -40,3 +41,7 @@ def parse_json(filename):
         contents = contents['data'][0]
 
     return contents
+
+def timestamp():
+    now = datetime.utcnow() # datetime.now(TIMEZONE)
+    return now.strftime("%Y-%m-%d %H:%M:%S.%f")

@@ -12,35 +12,34 @@ def create_cronjob():
 
     for line in cron.lines:
         line = line
-        if 'automated_airdrop' in f'{line}'.strip():
-            print("Cron job already exists")
+        if 'auto_airdrop' in f'{line}'.strip():
+            return "Cron job already exists"
             break
 
-    if 'automated_airdrop' not in f'{line}'.strip():
-        job = cron.new(command='/usr/bin/python3 ~/tipbot-v2/automated_airdrop.py',
-                       comment='automated_airdrop')
+    if 'auto_airdrop' not in f'{line}'.strip():
+        job = cron.new(command='/usr/bin/python3 ~/tipbot-v2/auto_airdrop.py', comment='auto_airdrop')
         job.hour.every(3)
         job.minute.on(0)
         job.enable(False)
         cron.write()
-        print("Cron job created")
+        return "Cron job created"
 
 def enable_batch_airdrop():
     cron = CronTab(user='root')
     for job in cron:
-        if job.comment == 'automated_airdrop':
+        if job.comment == 'auto_airdrop':
             job.enable(True)
             cron.write()
-            print("Enabled!")
+            return "Enabled!"
         else:
-            print("Job doesn't exist")
+            return "Job doesn't exist"
 
 def disable_batch_airdrop():
     cron = CronTab(user='root')
     for job in cron:
-        if job.comment == 'automated_airdrop':
+        if job.comment == 'auto_airdrop':
             job.enable(False)
             cron.write()
-            print("Disabled!")
+            return "Disabled!"
         else:
-            print("Job doesn't exist.")
+            return "Job doesn't exist."

@@ -27,6 +27,10 @@ class Game(commands.Cog):
         snowflake = ctx.message.author.id
         #make sure the list of args contains on one user
         users=list(set(args))
+
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         if len(users) == 0:
             await ctx.send("{} **:warning:You must guess One user!:warning:**".format(ctx.message.author.mention))
             return
@@ -112,6 +116,10 @@ class Game(commands.Cog):
         snowflake = ctx.message.author.id
         #the betting user is the house
         bet_user = str(self.game_id)
+
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+
         #check if amount is negative and return error to user in chat
         if amount <= 0.0 or float('{:.8f}'.format(amount)) == 0.00000000:
             await ctx.send("{} **:warning:You cannot bet <= 0 or with a decimal value that has more than 8 leading zeros!:warning:**".format(ctx.message.author.mention))
