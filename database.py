@@ -23,7 +23,7 @@ cursor = connection.cursor(pymysql.cursors.DictCursor)
 #cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
 #connection.commit()
 
-#cursor.execute("USE {};".format(database))
+#cursor.execute("USE {};".format('mysql'))
 
 
 def run():
@@ -45,12 +45,15 @@ def run():
             amount DECIMAL(20, 8) NOT NULL,
             txid VARCHAR(256) NOT NULL,
             status VARCHAR(20) NOT NULL,
+            timestamp DATETIME,
             FOREIGN KEY (snowflake_fk) REFERENCES users(snowflake_pk)
             )""")
         cursor.execute("""CREATE TABLE IF NOT EXISTS withdrawal (
             snowflake_fk BIGINT UNSIGNED NOT NULL,
             amount DECIMAL(20, 8) NOT NULL,
             txid VARCHAR(256) NOT NULL,
+            status VARCHAR(20) NOT NULL,
+            timestamp DATETIME,
             FOREIGN KEY (snowflake_fk) REFERENCES users(snowflake_pk)
             )""")
         cursor.execute("""CREATE TABLE IF NOT EXISTS tip (

@@ -371,7 +371,6 @@ class Mysql:
                         self.confirm_stake(txid)
 
                     #once confirmed split the stake between users balance %
-                
 
         def get_transaction_status_by_txid(self, txid):
             cursor = self.__setup_cursor(
@@ -384,15 +383,27 @@ class Mysql:
                 return "DOESNT_EXIST"
 
             return result_set["status"]
-# endregion
 
-# region Deposit/Withdraw/Tip/Soak
+        def get_withdrawal_transaction_status_by_txid(self, txid):
+            cursor = self.__setup_cursor(
+                pymysql.cursors.DictCursor)
+            to_exec = "SELECT txid FROM withdrawal WHERE txid = %s"
+            cursor.execute(to_exec, (txid,))
+            result_set = cursor.fetchone()
+            cursor.close()
+            if not result_set:
+                return "DOESNT_EXIST"
+
+            return result_set
+        # endregion
+
+        # region Deposit/Withdraw/Tip/Soak
         def add_deposit(self, snowflake, amount, txid, status):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "INSERT INTO deposit(snowflake_fk, amount, txid, status) VALUES(%s, %s, %s, %s)"
+            to_exec = "INSERT INTO deposit(snowflake_fk, amount, txid, status, timestamp) VALUES(%s, %s, %s, %s, %s)"
             cursor.execute(
-                to_exec, (str(snowflake), str(amount), str(txid), str(status)))
+                to_exec, (str(snowflake), str(amount), str(txid), str(status), str(parsing.timestamp())))
             cursor.close()
             self.__connection.commit()
 
@@ -403,7 +414,6 @@ class Mysql:
             cursor.execute(to_exec, ('CONFIRMED', str(txid)))
             cursor.close()
             self.__connection.commit()
-
 
         #confirm the stake with the status=CONRIRMED-STAKE
         def confirm_stake(self, txid):
@@ -424,17 +434,25 @@ class Mysql:
                 return None
 
             self.remove_from_balance(snowflake, amount)
-            return self.add_withdrawal(snowflake, amount, txid)
+            return self.add_withdrawal(snowflake, amount, txid, 'UNCONFIRMED')
 
-        def add_withdrawal(self, snowflake, amount, txid):
+        def add_withdrawal(self, snowflake, amount, txid, status):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "INSERT INTO withdrawal(snowflake_fk, amount, txid) VALUES(%s, %s, %s)"
+            to_exec = "INSERT INTO withdrawal(snowflake_fk, amount, txid, status, timestamp) VALUES(%s, %s, %s, %s, %s)"
             cursor.execute(
-                to_exec, (str(snowflake), str(amount), str(txid)))
+                to_exec, (str(snowflake), str(amount), str(txid), str(status), str(parsing.timestamp())))
             cursor.close()
             self.__connection.commit()
             return txid
+
+        def confirm_withdrawal(self, txid):
+            cursor = self.__setup_cursor(
+                pymysql.cursors.DictCursor)
+            to_exec = "UPDATE withdrawal SET status = %s WHERE txid = %s"
+            cursor.execute(to_exec, ('CONFIRMED', str(txid)))
+            cursor.close()
+            self.__connection.commit()
 
         def add_tip(self, snowflake_from_fk, snowflake_to_fk, amount):
             self.remove_from_balance(snowflake_from_fk, amount)
@@ -467,9 +485,9 @@ class Mysql:
             cursor.execute(to_exec, (to, str(server.id),))
             cursor.close()
             self.__connection.commit()
-# endregion
+        # endregion
 
-# region Last message
+        # region Last message
         def user_last_msg_check(self, user_id, content, is_private):
             #if the user is not registered 
             if self.get_user(user_id) is None:
@@ -610,7 +628,7 @@ class Mysql:
             #database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT snowflake_fk, amount, txid FROM deposit WHERE snowflake_fk = %s"
+            to_exec = "SELECT snowflake_fk, amount, txid, timestamp FROM deposit WHERE snowflake_fk = %s ORDER BY timestamp DESC"
             cursor.execute(to_exec, str(snowflake))
             deposits = cursor.fetchall()
             cursor.close()
@@ -625,7 +643,7 @@ class Mysql:
         def get_deposit_amount(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT snowflake_fk, amount, txid, status FROM deposit WHERE txid = %s"
+            to_exec = "SELECT snowflake_fk, amount, txid, timestamp status FROM deposit WHERE txid = %s ORDER BY timestamp DESC"
             cursor.execute(to_exec, str(txid))
             deposit = cursor.fetchone()
             cursor.close()
@@ -641,7 +659,7 @@ class Mysql:
             #database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT snowflake_fk, amount, txid FROM withdrawal WHERE snowflake_fk = %s"
+            to_exec = "SELECT snowflake_fk, amount, txid, timestamp FROM withdrawal WHERE snowflake_fk = %s ORDER BY timestamp DESC"
             cursor.execute(to_exec, str(snowflake))
             deposits = cursor.fetchall()
             cursor.close()
@@ -656,7 +674,7 @@ class Mysql:
         def get_withdrawal_amount(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT snowflake_fk, amount, txid FROM withdrawal WHERE txid = %s"
+            to_exec = "SELECT snowflake_fk, amount, txid, timestamp FROM withdrawal WHERE txid = %s ORDER BY timestamp DESC"
             cursor.execute(to_exec, str(txid))
             withdrawal = cursor.fetchone()
             cursor.close()
