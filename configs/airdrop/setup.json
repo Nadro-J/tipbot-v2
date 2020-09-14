@@ -1,0 +1,11 @@
+{
+    "title": "BitGreen",
+    "url": "https://bitg.org",
+    "thumbnail": "https://i.imgur.com/tTm8HtR.png",
+    "icon": "https://i.imgur.com/o4DuN6L.png",
+    "ann_channel": ,
+    "airdrop": "./configs/airdrop/current-airdrop.json",
+    "sent": "./configs/airdrop/persistent-sent.json",
+    "twitter": "./configs/airdrop/twitter-auth.json",
+    "self_path": "./configs/airdrop/setup.json"
+}
