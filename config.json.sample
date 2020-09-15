@@ -1,19 +1,19 @@
 {"data": [
     {
         "discord": {
-            "token": "token"
+            "token": ""
         },
         "mysql": {
-            "db_host": "hostname",
-            "db_user": "user",
-            "db_pass": "pass",
-            "db": "database"
+            "db_host": "",
+            "db_user": "",
+            "db_pass": "",
+            "db": ""
         },
         "rpc": {
             "rpc_host": "127.0.0.1",
-            "rpc_port": "20102",
-            "rpc_user": "user",
-            "rpc_pass": "pass"
+            "rpc_port": "8331",
+            "rpc_user": "",
+            "rpc_pass": ""
         },
         "logging": {
             "print_level": 3,
@@ -25,23 +25,43 @@
             "use_max_recipients": false,
             "soak_min_received": 0.001,
             "use_min_received": false,
-            "min_amount": 1            
+            "min_amount": 0.0001
         },
         "rain": {
-            "user_activity_required_m": 30,            
-            "min_num_messages_requred": 4,
-            "delay_between_messages_required_s": 60,
-            "min_num_words_required": 3,
+            "user_activity_required_m": 60,
+            "min_num_messages_requred": 1,
+            "delay_between_messages_required_s": 15,
+            "min_num_words_required": 1,
             "max_recipients": 50,
-            "use_max_recipients": false,            
-            "min_amount": 1         
-        },           
-        "txfee": 0.001,
-        "owners": ["owners discord id"],
-        "prefix": "?",
-        "description": "MyMn Tipbot",
-        "skip_cogs": [""],  
-        "explorer_url": "myexplorer.com/tx/",              
-        "currency_symbol": "MyMn"          
+            "use_max_recipients": false,
+            "min_amount": 0.00001
+        },
+        "embed_msg": {
+            "color": "0x2fbc1b",
+            "thumb_embed_url": "i.imgur.com/xi6GwFn.png",
+            "footer_msg_text": "User Agreement: This bot is in pre-alpha stage - Use at your own risk."
+        },
+        "txfee": 0.00010000,
+        "owners": [],
+        "treasurer": "100000000000000010",
+        "withdraw_fee": "0.01",
+        "withdraw_max": "25",
+        "min_withdrawal": "0.001",
+        "stake_bal": "100000000000000011",
+        "donation": "100000000000000012",
+        "game_bal": "100000000000000013",
+        "airdrop": "100000000000000014",
+        "prefix": "$",
+        "description": "BitGreen tip bot",
+        "skip_cogs": [],
+        "register_keyword": "register",
+        "explorer_url": "explorer.bitg.org/tx/",
+        "currency_symbol": "BITG",
+        "currency_name": "BitGreen",
+        "handler_msg": {
+            "tip": "$tip *{amount}* *{name}*\n\n**Example**\n`$tip 0.5 @nadroj.py#0420`",
+            "bet": "$bet *{amount}*\n\n**Example**\n`$bet 0.005`",
+            "withdraw": "$withdraw *{address}* *{amount}*\n\n**Example**\n`$withdraw GUV3VNPz5FNmQCTnifbf17U9Xyd22eAcqB 0.5`"
+        }
     }
 ]}
