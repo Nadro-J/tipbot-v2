@@ -14,7 +14,7 @@ class task():
         self.sent           = parsing.load_json(f'{self.relative_path}/configs/airdrop/persistent-sent.json')
         self.airdropConf    = parsing.load_json(f'{self.relative_path}/configs/airdrop/current-airdrop.json')
         self.wallet         = parsing.load_json(f'{self.relative_path}/configs/airdrop/wallet-config.json')
-        self.batch_log      = f'{self.relative_path}/batch-log.txt'
+        self.batch_log      = f'{self.relative_path}/logs/batch-log.txt'
 
     # debugging; log time each batch task has been completed
     def task_logging(self):

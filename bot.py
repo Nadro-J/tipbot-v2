@@ -2,9 +2,7 @@ import discord
 from discord.ext import commands
 from utils import output, parsing, checks, mysql_module, helpers
 import os
-import traceback
-import database
-import re
+from setup import database
 
 config = parsing.parse_json('config.json')
 skip_cogs=config['skip_cogs']
@@ -14,7 +12,7 @@ Mysql = mysql_module.Mysql()
 bot = commands.Bot(command_prefix=config['prefix'], description=config["description"])
 
 try:
-    os.remove("log.txt")
+    os.remove("logs/log.txt")
 except FileNotFoundError:
     pass
 
@@ -29,17 +27,15 @@ startup_extensions=[x for x in startup_extensions if x not in skip_cogs]
 @bot.event
 async def on_ready():
     output.info("Loading {} extension(s)...".format(len(startup_extensions)))
-
     for extension in startup_extensions:
         try:
             bot.load_extension("cogs.{}".format(extension.replace(".py", "")))
             loaded_extensions.append(extension)
-
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             output.error('Failed to load extension {}\n\t->{}'.format(extension, exc))
-    output.success('Successfully loaded the following extension(s): {}'.format(', '.join(loaded_extensions)))
-    output.info('You can now invite the bot to a server using the following link: https://discordapp.com/oauth2/authorize?client_id={}&scope=bot'.format(bot.user.id))
+            output.success('Successfully loaded the following extension(s): {}'.format(', '.join(loaded_extensions)))
+            output.info('You can now invite the bot to a server using the following link: https://discordapp.com/oauth2/authorize?client_id={}&scope=bot'.format(bot.user.id))
 
 @bot.event
 async def on_message(message):
