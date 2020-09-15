@@ -28,7 +28,7 @@
             "min_amount": 0.0001
         },
         "rain": {
-            "user_activity_required_m": 60,git
+            "user_activity_required_m": 60,
             "min_num_messages_requred": 1,
             "delay_between_messages_required_s": 15,
             "min_num_words_required": 1,
