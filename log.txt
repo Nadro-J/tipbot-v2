@@ -1,3 +1,0 @@
-[INFO]    Loading 14 extension(s)...
-[SUCCESS] Successfully loaded the following extension(s): uptime, help, soak, rain, balance, withdraw, log, wallet_info, tip, deposit, pull, game, txlist, server
-[INFO]    You can now invite the bot to a server using the following link: https://discordapp.com/oauth2/authorize?client_id=584869958878494724&scope=bot

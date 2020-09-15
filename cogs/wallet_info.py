@@ -1,10 +1,6 @@
-import discord, json, requests
+import discord
 from discord.ext import commands
-from utils import output, checks, helpers, parsing, mysql_module, rpc_module as rpc
-import os
-import traceback
-import database
-import re
+from utils import checks, parsing, mysql_module, rpc_module as rpc
 
 mysql = mysql_module.Mysql()
 #define bot to use his avatarurl
