@@ -122,15 +122,17 @@ class Withdraw(commands.Cog):
         embed = discord.Embed(title="{} {} Withdrawals".format(self.coin_name, self.currency_symbol), color=self.embed_color)
 
         user_addy = mysql.get_address(user.id)
-        mysql.check_for_updated_balance(str(user.id))
+        mysql.check_for_updated_withdrawal_confirmations(str(user.id))
+        mysql.get_balance(str(user.id), check_update=True)
         embed.add_field(name=":notepad_spiral: Deposit Address", value="`{}`".format(user_addy), inline=True)
 
         # Get the list of deposit txns by user.id transactions
         conf_txns = mysql.get_withdrawal_list_byuser(user.id)
+
         embed.add_field(name=":evergreen_tree: Number of withdrawals", value=len(conf_txns), inline=True)
 
-        # List the transactions
-        for txns in conf_txns:
+        # List the transactions (MAX=5)
+        for txns in mysql.get_withdrawal_list_byuser(user.id):
             txcounter = txcounter + 1
             wit_amount = mysql.get_withdrawal_amount(txns)
             embed.add_field(name=":currency_exchange: TXID #{}".format(txcounter), value="<https://{}{}>".format(self.explorer, str(txns)), inline=False)
@@ -140,11 +142,13 @@ class Withdraw(commands.Cog):
             if wit_status == 'CONFIRMED':
                 embed.add_field(name=":white_check_mark: Deposit status", value="CONFIRMED", inline=True)
             else:
-                embed.add_field(name=":ballot_box_with_check: Deposit status", value="DOESNT_EXIST", inline=True)
+                embed.add_field(name=":ballot_box_with_check: Deposit status", value="UNCONFIRMED", inline=True)
 
            # Show a maximum of 5 withdrawals (limited by Discords 2000 character limitation)
             if txcounter == 5 or len(conf_txns) == txcounter:
                 break
+
+            embed.add_field(name="\u200b\n", value="\u200b\n", inline=False)
 
         await ctx.author.send(embed=embed)
 

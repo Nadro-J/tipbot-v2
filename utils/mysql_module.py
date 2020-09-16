@@ -48,7 +48,7 @@ class Mysql:
             self.__connection.ping(True)
             return self.__connection.cursor(cur_type)
 
-# region User
+        # region User
         def make_user(self, snowflake, address):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -84,7 +84,7 @@ class Mysql:
             if result_set is None:
                 address = rpc.getnewaddress(snowflake)
                 self.make_user(snowflake, address)
-            
+
             return result_set
 
         def register_user(self, snowflake):
@@ -101,7 +101,7 @@ class Mysql:
             if result_set is None:
                 address = rpc.getnewaddress(str(snowflake))
                 self.make_user(snowflake, address)
-                
+
         def get_user(self, snowflake):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -111,7 +111,7 @@ class Mysql:
             cursor.close()
             return result_set
 
-        #get staking user
+        # get staking user
         def get_staking_user(self, snowflake):
             if snowflake == self.stakeflake:
                 cursor = self.__setup_cursor(
@@ -124,7 +124,7 @@ class Mysql:
             else:
                 return None
 
-        #get user balance
+        # get user balance
         def get_user_balance(self, snowflake):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -132,11 +132,11 @@ class Mysql:
             cursor.execute(to_exec, (str(snowflake)))
             result_set = cursor.fetchone()
             cursor.close()
-            return result_set           
+            return result_set
 
         def get_user_by_address(self, address):
             cursor = self.__setup_cursor(
-                pymysql.cursors.DictCursor)           
+                pymysql.cursors.DictCursor)
             to_exec = "SELECT snowflake_pk, balance, balance_unconfirmed, address, last_msg_time, rain_last_msg_time, rain_msg_count FROM users WHERE address LIKE %s"
             cursor.execute(to_exec, (str(address)))
             result_set = cursor.fetchone()
@@ -146,14 +146,15 @@ class Mysql:
         def get_address(self, snowflake):
             result_set = self.get_user(snowflake)
             return result_set.get("address")
-# endregion
 
-# region Servers/Channels
+        # endregion
+
+        # region Servers/Channels
         def check_server(self, server: discord.Guild):
             if server is None:
                 return
             cursor = self.__setup_cursor(
-                pymysql.cursors.DictCursor)        
+                pymysql.cursors.DictCursor)
             to_exec = "SELECT server_id, enable_soak FROM server WHERE server_id LIKE %s"
             cursor.execute(to_exec, (server.id))
             result_set = cursor.fetchone()
@@ -216,7 +217,7 @@ class Mysql:
 
         def add_channel(self, channel):
             cursor = self.__setup_cursor(
-                pymysql.cursors.DictCursor)            
+                pymysql.cursors.DictCursor)
             to_exec = "INSERT INTO channel(channel_id, server_id, enabled) VALUES(%s, %s, 1)"
             cursor.execute(
                 to_exec, (str(channel.id), str(channel.server.id)))
@@ -225,15 +226,16 @@ class Mysql:
 
         def remove_channel(self, channel):
             cursor = self.__setup_cursor(
-                pymysql.cursors.DictCursor)            
+                pymysql.cursors.DictCursor)
             to_exec = "DELETE FROM channel WHERE channel_id = %s"
             cursor.execute(to_exec, (str(channel.id),))
             cursor.close()
             self.__connection.commit()
-# endregion
 
-# region Balance
-        def set_balance(self, snowflake, to, is_unconfirmed = False):
+        # endregion
+
+        # region Balance
+        def set_balance(self, snowflake, to, is_unconfirmed=False):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             if is_unconfirmed:
@@ -244,8 +246,8 @@ class Mysql:
             cursor.close()
             self.__connection.commit()
 
-        def get_balance(self, snowflake, check_update=False, check_unconfirmed = False):
-            #run check to see if staking user
+        def get_balance(self, snowflake, check_update=False, check_unconfirmed=False):
+            # run check to see if staking user
             if str(snowflake) == self.stakeflake:
                 if check_update:
                     self.check_for_updated_mining_balance()
@@ -257,6 +259,7 @@ class Mysql:
             else:
                 if check_update:
                     self.check_for_updated_balance(snowflake)
+                    self.check_for_updated_withdrawal_confirmations(snowflake)
 
                 result_set = self.get_user(snowflake)
                 if check_unconfirmed:
@@ -264,7 +267,7 @@ class Mysql:
                 else:
                     return result_set.get("balance")
 
-        def add_to_balance(self, snowflake, amount, is_unconfirmed = False):
+        def add_to_balance(self, snowflake, amount, is_unconfirmed=False):
             self.set_balance(snowflake, self.get_balance(
                 snowflake) + Decimal(amount))
 
@@ -273,13 +276,13 @@ class Mysql:
                 snowflake) - Decimal(amount))
 
         def add_to_balance_unconfirmed(self, snowflake, amount):
-            balance_unconfirmed = self.get_balance(snowflake, check_unconfirmed = True) 
-            self.set_balance(snowflake, balance_unconfirmed + Decimal(amount), is_unconfirmed = True)
+            balance_unconfirmed = self.get_balance(snowflake, check_unconfirmed=True)
+            self.set_balance(snowflake, balance_unconfirmed + Decimal(amount), is_unconfirmed=True)
 
         def remove_from_balance_unconfirmed(self, snowflake, amount):
-            balance_unconfirmed = self.get_balance(snowflake, check_unconfirmed = True) 
-            self.set_balance(snowflake, balance_unconfirmed - Decimal(amount), is_unconfirmed = True)
-            
+            balance_unconfirmed = self.get_balance(snowflake, check_unconfirmed=True)
+            self.set_balance(snowflake, balance_unconfirmed - Decimal(amount), is_unconfirmed=True)
+
         def check_for_updated_balance(self, snowflake):
             """
             Uses RPC to get the latest transactions and updates
@@ -298,7 +301,7 @@ class Mysql:
                 amount = tx["amount"]
                 confirmations = tx["confirmations"]
                 address = tx["address"]
-                status = self.get_transaction_status_by_txid(txid)
+                deposit_status = self.get_transaction_status_by_txid(txid)
                 user = self.get_user_by_address(address)
 
                 # This address isn't a part of any user's account
@@ -306,20 +309,42 @@ class Mysql:
                     continue
 
                 snowflake_cur = user["snowflake_pk"]
-                if status == "DOESNT_EXIST" and confirmations >= MIN_CONFIRMATIONS_FOR_DEPOSIT:
+
+                if deposit_status == "DOESNT_EXIST" and confirmations >= MIN_CONFIRMATIONS_FOR_DEPOSIT:
                     self.add_to_balance(snowflake_cur, amount)
                     self.add_deposit(snowflake_cur, amount, txid, 'CONFIRMED')
-                elif status == "DOESNT_EXIST" and confirmations < MIN_CONFIRMATIONS_FOR_DEPOSIT:
+                elif deposit_status == "DOESNT_EXIST" and confirmations < MIN_CONFIRMATIONS_FOR_DEPOSIT:
                     self.add_deposit(snowflake_cur, amount,
                                      txid, 'UNCONFIRMED')
                     self.add_to_balance_unconfirmed(snowflake_cur, amount)
-                elif status == "UNCONFIRMED" and confirmations >= MIN_CONFIRMATIONS_FOR_DEPOSIT:
+                elif deposit_status == "UNCONFIRMED" and confirmations >= MIN_CONFIRMATIONS_FOR_DEPOSIT:
                     self.add_to_balance(snowflake_cur, amount)
                     self.remove_from_balance_unconfirmed(snowflake_cur, amount)
                     self.confirm_deposit(txid)
+
+        def check_for_updated_withdrawal_confirmations(self, snowflake):
+            """
+            Uses RPC to get the latest transactions and updates
+            the user balances accordingly
+
+            This code is based off of parse_incoming_transactions in
+            https://github.com/tehranifar/ZTipBot/blob/master/src/wallet.py
+            """
+            transaction_list = rpc.listtransactions_all()
+            for tx in transaction_list:
+                if tx["category"] != "send":
+                    continue
+                if tx.get('generated') is True:
+                    continue
+
+                txid = tx["txid"]
+                confirmations = tx["confirmations"]
+
+                withdrawal_status = self.get_withdrawal_transaction_status_by_txid(txid)
+                if withdrawal_status == "UNCONFIRMED" and confirmations >= MIN_CONFIRMATIONS_FOR_DEPOSIT:
                     self.confirm_withdrawal(txid)
 
-        #staking check
+        # staking check
         def check_for_updated_mining_balance(self):
             """
             Uses RPC to get the latest transactions and updates
@@ -328,13 +353,13 @@ class Mysql:
             This code is based off of parse_incoming_transactions in
             https://github.com/tehranifar/ZTipBot/blob/master/src/wallet.py
             """
-            #snowflake of staking account
+            # snowflake of staking account
             snowflake = str(self.stakeflake)
-            #create a new user for staking stake
-            #generate snowflake
-            #self.check_for_user_and_make(snowflake)
+            # create a new user for staking stake
+            # generate snowflake
+            # self.check_for_user_and_make(snowflake)
             user = self.get_staking_user(snowflake)
-            
+
             all_users = [x for x in self.get_reg_users_id() if x is not snowflake]
 
             for ids in all_users:
@@ -345,7 +370,7 @@ class Mysql:
                 transaction_list = rpc.listtransactions(str(ids), 100)
 
                 for tx in transaction_list:
-                    # if the generated tag is true this is a stake        
+                    # if the generated tag is true this is a stake
                     if tx.get('generated') is None:
                         # a stake will not affect the individual users balance
                         continue
@@ -356,22 +381,22 @@ class Mysql:
                     mint_status = tx["generated"]
                     status = self.get_transaction_status_by_txid(txid)
 
-                    #acreddit the staking user throughout the confirmation process
-                    #the stake will take longer to confirm
+                    # acreddit the staking user throughout the confirmation process
+                    # the stake will take longer to confirm
                     snowflake_cur = snowflake
                     if status == "DOESNT_EXIST" and mint_status is True:
                         self.add_to_balance(snowflake_cur, amount)
                         self.add_deposit(snowflake_cur, amount, txid, 'CONFIRMED-STAKE')
                     elif status == "DOESNT_EXIST" and confirmations < 101:
                         self.add_deposit(snowflake_cur, amount,
-                                        txid, 'UNCONFIRMED-STAKE')
+                                         txid, 'UNCONFIRMED-STAKE')
                         self.add_to_balance_unconfirmed(snowflake_cur, amount)
                     elif status == "UNCONFIRMED-STAKE" and confirmations >= 101:
                         self.add_to_balance(snowflake_cur, amount)
                         self.remove_from_balance_unconfirmed(snowflake_cur, amount)
                         self.confirm_stake(txid)
 
-                    #once confirmed split the stake between users balance %
+                    # once confirmed split the stake between users balance %
 
         def get_transaction_status_by_txid(self, txid):
             cursor = self.__setup_cursor(
@@ -388,14 +413,15 @@ class Mysql:
         def get_withdrawal_transaction_status_by_txid(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
-            to_exec = "SELECT txid FROM withdrawal WHERE txid = %s"
+            to_exec = "SELECT status FROM withdrawal WHERE txid = %s"
             cursor.execute(to_exec, (txid,))
             result_set = cursor.fetchone()
             cursor.close()
             if not result_set:
-                return "DOESNT_EXIST"
+                return "UNCONFIRMED"
 
-            return result_set
+            return result_set["status"]
+
         # endregion
 
         # region Deposit/Withdraw/Tip/Soak
@@ -416,7 +442,7 @@ class Mysql:
             cursor.close()
             self.__connection.commit()
 
-        #confirm the stake with the status=CONRIRMED-STAKE
+        # confirm the stake with the status=CONRIRMED-STAKE
         def confirm_stake(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -486,11 +512,12 @@ class Mysql:
             cursor.execute(to_exec, (to, str(server.id),))
             cursor.close()
             self.__connection.commit()
+
         # endregion
 
         # region Last message
         def user_last_msg_check(self, user_id, content, is_private):
-            #if the user is not registered 
+            # if the user is not registered
             if self.get_user(user_id) is None:
                 return False
             else:
@@ -516,7 +543,7 @@ class Mysql:
         def update_last_msg(self, user, last_msg_time, content):
             rain_config = parsing.parse_json('config.json')['rain']
             min_num_words_required = rain_config["min_num_words_required"]
-            delay_between_messages_required_s = rain_config["delay_between_messages_required_s"]            
+            delay_between_messages_required_s = rain_config["delay_between_messages_required_s"]
             user_activity_required_m = rain_config["user_activity_required_m"]
 
             content_adjusted = helpers.unicode_strip(content)
@@ -542,35 +569,38 @@ class Mysql:
 
             if last_msg_time is None:
                 user["rain_msg_count"] = 0
-            else:                
+            else:
                 if last_msg_time >= (user_activity_required_m * 60):
                     user["rain_msg_count"] = 0
-            
+
             is_accepted_delay_between_messages = False
             if user["rain_last_msg_time"] is None:
                 is_accepted_delay_between_messages = True
-            elif (datetime.datetime.utcnow() - user["rain_last_msg_time"]).total_seconds() > delay_between_messages_required_s:
+            elif (datetime.datetime.utcnow() - user[
+                "rain_last_msg_time"]).total_seconds() > delay_between_messages_required_s:
                 is_accepted_delay_between_messages = True
 
             if adjusted_count >= min_num_words_required and is_accepted_delay_between_messages:
                 user["rain_msg_count"] += 1
                 user["rain_last_msg_time"] = datetime.datetime.utcnow()
-            user["last_msg_time"]=datetime.datetime.utcnow()
+            user["last_msg_time"] = datetime.datetime.utcnow()
 
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "UPDATE users SET last_msg_time = %s, rain_last_msg_time = %s, rain_msg_count = %s WHERE snowflake_pk = %s"
-            cursor.execute(to_exec, (user["last_msg_time"], user["rain_last_msg_time"], user["rain_msg_count"], user["snowflake_pk"]))
+            cursor.execute(to_exec, (
+            user["last_msg_time"], user["rain_last_msg_time"], user["rain_msg_count"], user["snowflake_pk"]))
 
             cursor.close()
-            self.__connection.commit()                      
-# endregion
+            self.__connection.commit()
 
-# region Active users
+        # endregion
 
-        def get_active_users_id(self, user_activity_since_minutes, is_rain_activity):         
+        # region Active users
+
+        def get_active_users_id(self, user_activity_since_minutes, is_rain_activity):
             since_ts = datetime.datetime.utcnow() - datetime.timedelta(minutes=user_activity_since_minutes)
-        
+
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             if not is_rain_activity:
@@ -580,37 +610,38 @@ class Mysql:
             cursor.execute(to_exec, (str(since_ts)))
             users = cursor.fetchall()
             cursor.close()
-            
+
             return_ids = []
             for user in users:
                 return_ids.append(user["snowflake_pk"])
-                
+
             return return_ids
 
-# endregion
+        # endregion
 
-# region Registered users
+        # region Registered users
 
-        def get_reg_users_id(self):         
+        def get_reg_users_id(self):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "SELECT snowflake_pk FROM users ORDER BY snowflake_pk"
             cursor.execute(to_exec)
             users = cursor.fetchall()
             cursor.close()
-            
+
             return_reg_ids = []
             for user in users:
                 return_reg_ids.append(user["snowflake_pk"])
-                
+
             return return_reg_ids
-# endregion
 
-# transaction history related calls - deposits
+        # endregion
 
-        #return a list of txids of a users deposit transactions
+        # transaction history related calls - deposits
+
+        # return a list of txids of a users deposit transactions
         def get_deposit_list(self, status):
-            #database search
+            # database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "SELECT amount, txid FROM deposit WHERE status = %s ORDER BY timestamp DESC"
@@ -624,9 +655,9 @@ class Mysql:
 
             return return_deptxid_list
 
-        #return a list of txids of a users deposit transactions
+        # return a list of txids of a users deposit transactions
         def get_deposit_list_byuser(self, snowflake):
-            #database search
+            # database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "SELECT snowflake_fk, amount, txid, timestamp FROM deposit WHERE snowflake_fk = %s ORDER BY timestamp DESC"
@@ -640,7 +671,7 @@ class Mysql:
 
             return return_deptxid_list
 
-        #get deposit info from txid
+        # get deposit info from txid
         def get_deposit_amount(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -651,13 +682,13 @@ class Mysql:
 
             return deposit["amount"]
 
-# endregion
+        # endregion
 
-# transaction history related calls - withdrawals
+        # transaction history related calls - withdrawals
 
-        #return a list of txids of a users withdrawal transactions
+        # return a list of txids of a users withdrawal transactions
         def get_withdrawal_list_byuser(self, snowflake):
-            #database search
+            # database search
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
             to_exec = "SELECT snowflake_fk, amount, txid, timestamp FROM withdrawal WHERE snowflake_fk = %s ORDER BY timestamp DESC"
@@ -671,7 +702,7 @@ class Mysql:
 
             return return_wittxid_list
 
-        #get deposit info from txid
+        # get deposit info from txid
         def get_withdrawal_amount(self, txid):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -682,9 +713,9 @@ class Mysql:
 
             return withdrawal["amount"]
 
-# endregion
+        # endregion
 
-# tip information calls
+        # tip information calls
         def get_tip_amounts_from_id(self, snowflake, snowflake_to):
             cursor = self.__setup_cursor(
                 pymysql.cursors.DictCursor)
@@ -692,12 +723,12 @@ class Mysql:
             cursor.execute(to_exec, str(snowflake))
             user_tips = cursor.fetchall()
             cursor.close()
-            
+
             return_tip_amounts = []
             for tips in user_tips:
                 if int(tips["snowflake_to_fk"]) == int(snowflake_to):
                     return_tip_amounts.append(tips["amount"])
-                
+
             return return_tip_amounts
 
 # end region
