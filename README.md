@@ -2,50 +2,53 @@
 
 
 ### TODO
-- [X] **Airdrop -> Tipbot merge** - _(prefix=$)_
+- [ ] **Airdrop -> Tipbot merge** - _(prefix=$)_
     - [ ] **Airdrop commands**
       - [ ] **USER commands**
         - [ ] getinfo
         - [ ] join
+            - [ ] twitter incentive airdrop
+            - [X] normalized airdrop
         - [ ] cmd
-      - [x] **ADMIN commands**
-        - [x] stats
-        - [x] end
-        - [x] airdrop
-        - [x] send
-        - [x] set_retweet
-        - [x] lasttx
-  - [ ] **Twitter commands**
-    - [x] **USER commands**
-      - [x] register_airdrop
-      - [x] verify
-    - [ ] **ADMIN commands**
-      - [ ] dfa_stats
-    - [x] **ADMIN commands**
-      - [x] setup_batch_cron
-      - [x] enable_batch_airdrop
-      - [x] disable_batch_airdrop
+      - [x] ~~**ADMIN commands**~~
+        - [x] ~~stats~~
+        - [x] ~~end~~
+        - [ ] airdrop
+            - [ ] twitter incentive airdrop
+            - [X] ~~normalized airdrop~~
+        - [x] ~~send~~
+        - [x] ~~set_retweet~~
+        - [x] ~~lasttx~~
+  - [X] ~~**Twitter commands**~~
+    - [x] ~~**USER commands**~~
+      - [x] ~~register_airdrop~~
+      - [x] ~~verify~~
+    - [x] ~~**ADMIN commands**~~
+      - [x] ~~dfa_stats~~
+      - [x] ~~setup_batch_cron~~
+      - [x] ~~enable_batch_airdrop~~
+      - [x] ~~disable_batch_airdrop~~
   
-- [x] **Upgrade to Discord v1.0**
-  - [x] **TipBot USER commands**
-    - [x] tip
-    - [x] donate
-    - [x] deposit
-      - [X] dlist
-    - [x] withdraw
-      - [x] wlist
-    - [x] rain
-    - [x] soak
-    - [x] bet
+- [ ] **Upgrade to Discord v1.0**
+  - [x] ~~**TipBot USER commands**~~
+    - [x] ~~tip~~
+    - [x] ~~donate~~
+    - [x] ~~deposit~~
+      - [X] ~~dlist~~
+    - [x] ~~withdraw~~
+      - [x] ~~wlist~~
+    - [x] ~~rain~~
+    - [x] ~~soak~~
+    - [x] ~~bet~~
     - [ ] guess
-    - [x] coingecko
-    - [ ] invite
-  - [x] **TipBot ADMIN commands**
-    - [x] wallet
-    - [x] uptime
-    - [ ] checksoak
-    - [ ] allowsoak
-    - [ ] log
+    - [x] ~~coingecko~~
+    - [x] ~~invite~~
+  - [x] ~~**TipBot ADMIN commands**~~
+    - [x] ~~wallet~~
+    - [x] ~~uptime~~
+    - [x] ~~checksoak~~
+    - [x] ~~allowsoak~~
+    - [x] ~~log~~
     - [ ] pull
     
 - [x] **SQL Server**
@@ -55,7 +58,7 @@
 
 - [ ] **Stress test**
     - [ ] **Transactions**
-        - [x] 100 transactions ``fe96d3ccee3f17527250a58d23550bf396a6f530b146ae981e9857b5712c23f1``
+        - [x] ~~100 transactions~~ ``fe96d3ccee3f17527250a58d23550bf396a6f530b146ae981e9857b5712c23f1``
         - [ ] 250 transactions
         - [ ] 500 transactions
         - [ ] 750 transactions
@@ -68,7 +71,7 @@
 - [ ] **Lottery**
 - [ ] **Governance**
     - [ ] Vote on future updates of the bot
-- [ ] **Github integration (proof-of-code i.e. a method of validating the bot is running exactly what's on discord)**
+- [ ] **Github integration (proof-of-code i.e. a method of validating the bot is running exactly what's on Github)**
 - [ ] **Tipping integrations (tip users by @ing the bot)**
     - [ ] Twitter integration
     - [ ] Reddit integration
