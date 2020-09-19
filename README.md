@@ -2,19 +2,19 @@
 
 
 ### TODO
-- [ ] **Airdrop -> Tipbot merge** - _(prefix=$)_
-    - [ ] **Airdrop commands**
-      - [ ] **USER commands**
-        - [ ] getinfo
-        - [ ] join
-            - [ ] twitter incentive airdrop
-            - [X] normalized airdrop
-        - [ ] cmd
+- [x] ~~**Airdrop -> Tipbot merge** - _(prefix=$)_~~
+    - [x] ~~**Airdrop commands**~~
+      - [x] ~~**USER commands**~~
+        - [x] ~~getinfo~~
+        - [x] ~~join~~
+            - [x] ~~twitter incentive airdrop~~
+            - [X] ~~normalized airdrop~~
+        - [x] ~~cmd~~
       - [x] ~~**ADMIN commands**~~
         - [x] ~~stats~~
         - [x] ~~end~~
-        - [ ] airdrop
-            - [ ] twitter incentive airdrop
+        - [x] ~~airdrop~~
+            - [x] ~~twitter incentive airdrop~~
             - [X] ~~normalized airdrop~~
         - [x] ~~send~~
         - [x] ~~set_retweet~~
@@ -29,7 +29,7 @@
       - [x] ~~enable_batch_airdrop~~
       - [x] ~~disable_batch_airdrop~~
   
-- [ ] **Upgrade to Discord v1.0**
+- [ ] ~~**Upgrade to Discord v1.0**~~
   - [x] ~~**TipBot USER commands**~~
     - [x] ~~tip~~
     - [x] ~~donate~~
@@ -40,7 +40,6 @@
     - [x] ~~rain~~
     - [x] ~~soak~~
     - [x] ~~bet~~
-    - [ ] guess
     - [x] ~~coingecko~~
     - [x] ~~invite~~
   - [x] ~~**TipBot ADMIN commands**~~
@@ -55,6 +54,7 @@
     - [ ] frequent backup of [users] table
     - [ ] test db failure i.e. disaster recovery
         - [ ] import from sql backup
+        - [x] backup sql database script
 
 - [ ] **Stress test**
     - [ ] **Transactions**
@@ -63,7 +63,7 @@
         - [ ] 500 transactions
         - [ ] 750 transactions
         - [ ] 1000 transactions
-    - [ ] Heavy command load
+    - [X] Heavy command load
 
 ### Future release
 - [ ] **Staking**
