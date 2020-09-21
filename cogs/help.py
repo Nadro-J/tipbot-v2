@@ -17,9 +17,6 @@ class Help(commands.Cog):
         """
         Displays a useful list of commands.
         """
-        if ctx.message.guild is not None:
-            await ctx.message.delete()
-
         try:
             embed = discord.Embed(color=self.color, title='Command list')
             embed.set_thumbnail(url=self.bot.user.avatar_url)
@@ -27,7 +24,7 @@ class Help(commands.Cog):
             embed.add_field(name=":bank: Wallet Commands", value="$deposit\n$withdraw\n$dlist\n$wlist\n$balance\n$tip", inline=True)
             embed.add_field(name=":money_with_wings: Distribute", value=f"$soak\n$rain", inline=True)
             embed.add_field(name=":game_die: Game", value=f"$bet", inline=True)
-            await ctx.send(embed=embed)
+            await ctx.author.send(embed=embed)
             if ctx.message.guild is not None:
                 await ctx.message.delete()
                 await ctx.send("{}, I PMed you some helpful info! Make sure to double check that it is from me!".format(ctx.message.author.mention))
