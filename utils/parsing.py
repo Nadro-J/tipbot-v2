@@ -7,8 +7,8 @@ def dump_json(filename, data):
             decode_jdata = json.dumps(json.JSONDecoder().decode(data))
             reload = json.loads(decode_jdata)
             json.dump(reload, f, indent=4)
-    except Exception as e:
-        print (e)
+    except Exception as error:
+        return error
 
 def load_json(path):
     if os.path.isfile(path):
