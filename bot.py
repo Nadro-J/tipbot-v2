@@ -34,8 +34,8 @@ async def on_ready():
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             output.error('Failed to load extension {}\n\t->{}'.format(extension, exc))
-            output.success('Successfully loaded the following extension(s): {}'.format(', '.join(loaded_extensions)))
-            output.info('You can now invite the bot to a server using the following link: https://discordapp.com/oauth2/authorize?client_id={}&scope=bot'.format(bot.user.id))
+    output.success('Successfully loaded the following extension(s): {}'.format(', '.join(loaded_extensions)))
+    output.info('You can now invite the bot to a server using the following link: https://discordapp.com/oauth2/authorize?client_id={}&scope=bot'.format(bot.user.id))
 
 @bot.event
 async def on_message(message):
@@ -57,6 +57,10 @@ async def on_message(message):
             return
 
     # check if staking account is set up
+    airdrop_account = config["airdrop"]
+    if Mysql.get_staking_user(airdrop_account) is None:
+        Mysql.register_user(airdrop_account)
+
     staking_account = config["stake_bal"]
     if Mysql.get_staking_user(staking_account) is None:
         Mysql.register_user(staking_account)
@@ -128,7 +132,7 @@ async def restart(ctx):
     author = str(ctx.message.author)
 
     try:
-        await bot.say("Restarting...")
+        await ctx.send("Restarting...")
         await bot.logout()
         bot.loop.stop()
         output.info('{} has restarted the bot...'.format(author))
@@ -138,7 +142,6 @@ async def restart(ctx):
         exc = '{}: {}'.format(type(e).__name__, e)
         output.error('{} has attempted to restart the bot, but the following '
                      'exception occurred;\n\t->{}'.format(author, exc))
-
 
 @bot.command(pass_context=True, hidden=True)
 @commands.check(checks.is_owner)
@@ -159,7 +162,6 @@ async def load(ctx, module: str):
                      'exception occured;\n\t->{}'.format(author, module, exc))
         await bot.say('Failed to load extension {}\n\t->{}'.format(module, exc))
 
-
 @bot.command(pass_context=True, hidden=True)
 @commands.check(checks.is_owner)
 async def unload(ctx, module: str):
@@ -177,7 +179,6 @@ async def unload(ctx, module: str):
         exc = '{}: {}'.format(type(e).__name__, e)
         await bot.say('Failed to load extension {}\n\t->{}'.format(module, exc))
 
-
 @bot.command(hidden=True)
 @commands.check(checks.is_owner)
 async def loaded():
@@ -188,7 +189,6 @@ async def loaded():
 
     await bot.say('Currently loaded extensions:\n```{}```'.format(string))
 
-
 @bot.event
 async def on_server_join(server):
     output.info("Added to {0}".format(server.name))
@@ -196,12 +196,10 @@ async def on_server_join(server):
     for channel in server.channels:
         Mysql.add_channel(channel)
 
-
 @bot.event
 async def on_server_leave(server):
     Mysql.remove_server(server)
     output.info("Removed from {0}".format(server.name))
-
 
 @bot.event
 async def on_channel_create(channel):
@@ -209,7 +207,6 @@ async def on_channel_create(channel):
         return
     Mysql.add_channel(channel)
     output.info("Channel {0} added to {1}".format(channel.name, channel.guild.name))
-
 
 @bot.event
 async def on_channel_delete(channel):
@@ -219,6 +216,7 @@ async def on_channel_delete(channel):
 # to be revised
 async def send_cmd_help(ctx, arg_type, error):
     command = ctx.message.content.split()[0][1:]
+
     try:
         help = config['handler_msg'][command]
     except KeyError:
@@ -236,19 +234,23 @@ async def send_cmd_help(ctx, arg_type, error):
                            color=discord.Color.red())
         em.add_field(name="Details", value="{}".format(descriptor), inline=True)
         em.add_field(name="Help", value="{}".format(help), inline=True)
-        await ctx.send(ctx.message.channel, embed=em)
+        await ctx.author.send(embed=em)
     else:
         em = discord.Embed(title=":exclamation: An error has occurred",
                            description="``Command key not found``",
                            color=discord.Color.red())
-        await ctx.send(ctx.message.channel, embed=em)
+        await ctx.author.send(embed=em)
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
         await send_cmd_help(ctx, commands.MissingRequiredArgument, error)
 
     elif isinstance(error, commands.BadArgument):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
         await send_cmd_help(ctx, commands.BadArgument, error)
 
     elif isinstance(error, commands.CommandInvokeError):
@@ -256,6 +258,11 @@ async def on_command_error(ctx, error):
         oneliner = "Error in command '{}' - {}: {}\nIf this issue persists, Please report it in the support server.".format(
             ctx.command.qualified_name, type(error.original).__name__, str(error.original))
         await ctx.send(oneliner)
+
+    elif isinstance(error, commands.CommandOnCooldown):
+        if ctx.message.guild is not None:
+            await ctx.message.delete()
+        await ctx.author.send(f'This command is on cooldown. Please wait {error.retry_after:.2f}s :alarm_clock: ')
 
 database.run()
 bot.run(config["discord"]["token"])
