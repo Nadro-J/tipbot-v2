@@ -158,37 +158,7 @@ class Twitter_commands(commands.Cog):
                 await ctx.author.send(embed=embed)
         else:
             embed = discord.Embed(color=self.color, title=self.config['title'], url=self.config['url'], description='No account found. You need to register before verifying.')
-            embed.add_field(name="Instructions", value="When registering make sure you use the following format\n``$register n4dro``", inline=True)
             embed.set_thumbnail(url=self.config['thumbnail'])
-            await ctx.author.send(embed=embed)
-
-    @commands.command()
-    @commands.has_any_role(*roles)
-    async def twitter(self, ctx):
-        embed = discord.Embed(color=self.color)
-        embed.set_thumbnail(url=self.config['thumbnail'])
-        embed.set_author(name=self.config['title'], url=self.config['url'], icon_url=self.config['icon'])
-        embed.add_field(name="Command", value="$register\n$verify\n$dfa_stats", inline=True)
-        embed.add_field(name="Description", value="Register to participate\nVerify to participate\nView registered stats", inline=True)
-        await ctx.send(embed=embed)
-
-    # ___- Individual command error handling -___
-    @register_airdrop.error
-    async def register_airdrop_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(color=self.error)
-            embed.set_thumbnail(url=self.config['thumbnail'])
-            embed.set_author(name="No argument given", icon_url=self.config['icon'])
-            embed.add_field(name="Instructions", value="When registering make sure you use the following format\n``$register n4dro``", inline=True)
-            await ctx.author.send(embed=embed)
-
-    @verify.error
-    async def verify_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(color=self.error)
-            embed.set_thumbnail(url=self.config['thumbnail'])
-            embed.set_author(name="No argument given", icon_url=self.config['icon'])
-            embed.add_field(name="Instructions", value="When verifying make sure you use the following format\n``$verify 35204b304795490e8cfca438c2832309``", inline=True)
             await ctx.author.send(embed=embed)
 
 def setup(bot):
