@@ -38,6 +38,11 @@ class task():
                             rpc.addParticipant(user['address'], self.airdropConf['amount'])
 
                     total_sent = self.airdropConf['amount'] * len(rpc.recipients)
+                    balance = mysql.get_balance('100000000000000014', check_update=True)
+
+                    if float(balance) < total_sent:
+                        print("Airdrop wallet is empty!")
+                        return
 
                     # send transactions
                     rpc.sendmany()
@@ -45,8 +50,7 @@ class task():
 
                     # Account set to 100000000000000010 for testing, to be changed when in production
                     # Reflect balance on SQL DB
-                    mysql.remove_from_balance('100000000000000010', total_sent)
-                    mysql.add_withdrawal('100000000000000010', total_sent, rpc.lastWalletTx()['txid'])
+                    mysql.remove_from_balance('100000000000000014', total_sent)
 
                     # change 'current-airdrop.json' by moving participants to 'persistent-sent.json'
                     self.airdropConf['airdrop-users'] = []
@@ -56,8 +60,6 @@ class task():
                 else:
                     print ("Not enough confirmations")
             else:
-                print ("Not private, this shouldn't print. If it does.. something broke")
-        else:
-            print ("Airdrop isn't persistent.")
+                print ("Airdrop isn't persistent.")
 
 task().batch_airdrop()
