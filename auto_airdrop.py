@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-
 import os, json
 from datetime import datetime
-from utils import parsing, rpc_module, mysql_module
+from utils import rpc_module, mysql_module, parsing
 
 rpc = rpc_module.Rpc()
 mysql = mysql_module.Mysql()
@@ -23,6 +22,10 @@ class task():
 
     def batch_airdrop(self):
             if self.airdropConf['active'] and self.airdropConf['twitter-bounty']:
+                if len(self.airdropConf['airdrop-users']) == 0:
+                    print (f"{parsing.timestamp()} - No recipients")
+                    return
+
                 for user in self.airdropConf['airdrop-users']:
                     self.sent['sent'].append(user)
 
@@ -41,15 +44,14 @@ class task():
                     balance = mysql.get_balance('100000000000000014', check_update=True)
 
                     if float(balance) < total_sent:
-                        print("Airdrop wallet is empty!")
+                        print(f"{parsing.timestamp()} - Airdrop wallet is empty!")
                         return
 
                     # send transactions
+                    print (f"{parsing.timestamp()} - Sending {total_sent} coins to {len(rpc.recipients)} addresses")
                     rpc.sendmany()
                     rpc.clearRecipients()
 
-                    # Account set to 100000000000000010 for testing, to be changed when in production
-                    # Reflect balance on SQL DB
                     mysql.remove_from_balance('100000000000000014', total_sent)
 
                     # change 'current-airdrop.json' by moving participants to 'persistent-sent.json'
@@ -58,8 +60,8 @@ class task():
                     parsing.dump_json(self.relative_path + self.config['airdrop'][1:], update_airdropConf)
                     self.task_logging()
                 else:
-                    print ("Not enough confirmations")
+                    print (f"{parsing.timestamp()} - Not enough .")
             else:
-                print ("Airdrop isn't persistent.")
+                print (f"{parsing.timestamp()} - Twitter bounty isn't running.")
 
 task().batch_airdrop()
