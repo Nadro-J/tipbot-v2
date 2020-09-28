@@ -61,7 +61,15 @@
         "handler_msg": {
             "tip": "$tip *{amount}* *{name}*\n\n**Example**\n`$tip 0.5 @nadroj.py#0420`",
             "bet": "$bet *{amount}*\n\n**Example**\n`$bet 0.005`",
-            "withdraw": "$withdraw *{address}* *{amount}*\n\n**Example**\n`$withdraw GUV3VNPz5FNmQCTnifbf17U9Xyd22eAcqB 0.5`"
+            "withdraw": "$withdraw *{address}* *{amount}*\n\n**Example**\n`$withdraw GUV3VNPz5FNmQCTnifbf17U9Xyd22eAcqB 0.5`",
+            "airdrop": "$airdrop {participants} {amount} {twitter-bounty}\n\n**Example**\n`$airdrop 25 0.1 0\n$airdrop 0 0.1 1`",
+            "set_retweet": "$set_retweet {ID}\n\n**Example**\n`$set_retweet 1128358947772145672`\n\n**Information**\nOpen the retweet on any browser. The URL should display something similar as shown below.\n`twitter.com/TwitterAPI/status/1128358947772145672`",
+            "join": "$join {address}\n\n**Example**\n`$join GPWb9jprtTkH9Qj5T4xHZiQDkHHh9v8xZa`",
+            "end": "$end {boolean}\n\n**Example**\n`$end 1`\n\n**Information**\nThis command requires a True or False argument. This acts as a safety measure to prevent the accidental cancellation of an airdrops.",
+            "register_airdrop": "$register_airdrop {twitter-username}\n\n**Example**\n`$register_airdrop n4dro`",
+            "verify": "$verify {2fa-code}\n\n**Example**\n`$verify 0c08084a18d944b9bbf244f4ccd23dd2`",
+            "allowsoak": "$allowsoak {boolean}\n\n**Example**\n`$allowsoak 1`",
+            "soak": "$soak {amount}\n\n**Example**\n`$soak 1`"
         }
     }
 ]}
