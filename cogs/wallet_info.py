@@ -96,12 +96,10 @@ class Wallet(commands.Cog):
                         value="``{0}``\n"
                               "**Balance**: {1:.6f}\n\u200b".format(mysql.get_address(self.game_bal),
                                                  mysql.get_balance(self.game_bal, check_update=True)), inline=True)
-#        embed.add_field(name=":airplane: Airdrop",
-#                        value="**Address**"
-#                              "\n`{0}`\n"
-#                              "**Balance**"
-#                              "\n{1:.8f}".format(mysql.get_address(self.airdrop),
-#                                                 mysql.get_balance(self.airdrop, check_update=True)), inline=True)
+        embed.add_field(name=":airplane: Airdrop",
+                        value="`{0}`\n"
+                              "**Balance:** {1:.6f}".format(mysql.get_address(self.airdrop),
+                                                 mysql.get_balance(self.airdrop, check_update=True)), inline=True)
 
         embed.add_field(name="\u200b\n", value="\u200b\n", inline=True)  # Buffer
 

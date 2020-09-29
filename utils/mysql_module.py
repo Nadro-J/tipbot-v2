@@ -3,11 +3,12 @@ import discord
 from utils import parsing, rpc_module, helpers
 from decimal import Decimal
 import datetime
+from os.path import expanduser
 
 rpc = rpc_module.Rpc()
 
 MIN_CONFIRMATIONS_FOR_DEPOSIT = 2
-
+HOMEPATH = expanduser("~")
 
 class Mysql:
     """
@@ -24,7 +25,7 @@ class Mysql:
 
     class __Mysql:
         def __init__(self):
-            config = parsing.parse_json('config.json')["mysql"]
+            config = parsing.parse_json(f'{HOMEPATH}/tipbot-v2/config.json')["mysql"]
             self.__host = config["db_host"]
             self.__port = int(config.get("db_port", 3306))
             self.__db_user = config["db_user"]
@@ -32,8 +33,8 @@ class Mysql:
             self.__db = config["db"]
             self.__connected = 1
             self.__setup_connection()
-            self.txfee = parsing.parse_json('config.json')["txfee"]
-            self.stakeflake = parsing.parse_json('config.json')["stake_bal"]
+            self.txfee = parsing.parse_json(f'{HOMEPATH}/tipbot-v2/config.json')["txfee"]
+            self.stakeflake = parsing.parse_json(f'{HOMEPATH}/tipbot-v2/config.json')["stake_bal"]
 
         def __setup_connection(self):
             self.__connection = pymysql.connect(

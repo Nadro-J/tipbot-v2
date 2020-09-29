@@ -23,7 +23,7 @@ cursor = connection.cursor(pymysql.cursors.DictCursor)
 #cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
 #connection.commit()
 
-#cursor.execute("USE {};".format('mysql'))
+cursor.execute("USE {};".format('mysql'))
 
 
 def run():

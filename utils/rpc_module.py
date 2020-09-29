@@ -1,9 +1,13 @@
 import json, requests
 from utils import parsing
+import os
+from os.path import expanduser
+
+HOMEPATH = expanduser("~")
 
 class Rpc:
     def __init__(self):
-        config = parsing.parse_json('config.json')["rpc"]
+        config = parsing.parse_json(f'{HOMEPATH}/tipbot-v2/config.json')["rpc"]
         self.recipients = {}
 
         self.rpc_host = config["rpc_host"]

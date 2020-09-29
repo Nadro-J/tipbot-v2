@@ -50,7 +50,7 @@ async def on_message(message):
         if Mysql.get_user(ids) is None:
             if message.author.id == ids:
                 Mysql.register_user(ids)
-    
+
     # check if the message is from a banned server
     if message.guild is not None:
         if Mysql.check_for_server_status(message.guild.id) == 2:
@@ -95,6 +95,9 @@ async def on_message(message):
         if Mysql.get_user(authid) is None:
             #if they they are not it the database but send the
             if str(message.content).startswith(rkeywordcall) is True:
+                if message.guild is not None:
+                    await message.delete()
+
                 Mysql.register_user(authid)
                 await message.channel.send('{} You are now registered! :tada:'.format(message.author.mention))
                 await message.channel.send('Use {}deposit to view your {} address'.format(prefix, coin_name))

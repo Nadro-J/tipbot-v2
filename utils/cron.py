@@ -17,7 +17,7 @@ def create_cronjob():
             break
 
     if 'auto_airdrop' not in f'{line}'.strip():
-        job = cron.new(command='/usr/bin/python3 ~/tipbot-v2/setup/auto_airdrop.py', comment='auto_airdrop')
+        job = cron.new(command='/usr/bin/python3 ~/tipbot-v2/auto_airdrop.py > ~/tipbot-v2/auto_output.log 2>&1', comment='auto_airdrop')
         job.hour.every(3)
         job.minute.on(0)
         job.enable(False)
