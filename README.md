@@ -15,6 +15,12 @@
 * Allow users to withdraw coins from the wallet with respect to how many coins they have in the DB
 * Initiate airdrop where the user can participate by retweeting the specified tweet; this is to help towards social awareness/coin distribution
 
+#### Wallet settings
+* txfee = **_0.00001000_**
+* withdraw fee = **_0.005_**
+* minimum withdrawal = **_0.009_**
+* minimum confirmation = **_2_**
+
 ---
 
 ## Tested environment 
@@ -78,6 +84,14 @@ Press "Y" and ENTER to accept all the questions, with the exception of the one t
 systemctl status mysql.service
 ```
 You should see a status message that says "active (running)".
+
+> ##### Uninstall/Remove MySQL _(only required if anything breaks and you want to start the SQL server from scratch)_
+>> sudo apt-get remove --purge mysql*  
+sudo apt-get purge mysql*  
+sudo apt-get autoremove  
+sudo apt-get autoclean  
+sudo apt-get remove dbconfig-mysql  
+sudo apt-get install mysql-server  
 
 #### Creating SQL user, setting permissions for daily backups
 ```sql
