@@ -19,12 +19,13 @@ connection = pymysql.connect(
     db=db)
 cursor = connection.cursor(pymysql.cursors.DictCursor)
 
+# comment after initial running of bot.py
 #cursor.execute("DROP DATABASE IF EXISTS {};".format(db))
-#cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
-#connection.commit()
+cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
+connection.commit()
+#########################################
 
-cursor.execute("USE {};".format('mysql'))
-
+cursor.execute("USE {};".format(db))
 
 def run():
     with warnings.catch_warnings():
