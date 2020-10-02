@@ -18,7 +18,7 @@ class Game(commands.Cog):
         self.treasury_id = config["treasurer"]
 
     @commands.command(pass_context=True)
-    @commands.cooldown(1, 10)
+    @commands.cooldown(10, 30)
     async def bet(self, ctx, amount:float):
         """Place a bet on whether o not the number will be EVEN. Between 1, 9999999"""
         snowflake = ctx.message.author.id

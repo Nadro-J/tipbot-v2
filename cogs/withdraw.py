@@ -27,7 +27,7 @@ class Withdraw(commands.Cog):
         self.embed_color = int(embed_config["color"], 16)
 
     @commands.command(pass_context=True)
-    @commands.cooldown(1, 120)
+    @commands.cooldown(3, 120)
     async def withdraw(self, ctx, address: str, amount: float):
         """Withdraw coins from your account to any address, You agree to pay a withdrawal fee to support the costs of this service"""
         snowflake = ctx.message.author.id
