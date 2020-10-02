@@ -24,6 +24,7 @@ class Help(commands.Cog):
             embed.add_field(name=":bank: Wallet Commands", value="$deposit\n$withdraw\n$dlist\n$wlist\n$balance\n$tip", inline=True)
             embed.add_field(name=":money_with_wings: Distribute", value=f"$soak\n$rain", inline=True)
             embed.add_field(name=":game_die: Game", value=f"$bet", inline=True)
+            embed.add_field(name="Command Index", value="<https://github.com/Nadro-J/tipbot-v2/wiki/Command-Index>", inline=False)
             await ctx.author.send(embed=embed)
             if ctx.message.guild is not None:
                 await ctx.message.delete()
