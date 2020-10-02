@@ -4,6 +4,7 @@ from utils import parsing, output
 
 config = parsing.parse_json('config.json')["mysql"]
 host = config["db_host"]
+
 try:
     port = int(config["db_port"])
 except KeyError:
@@ -11,20 +12,15 @@ except KeyError:
 db_user = config["db_user"]
 db_pass = config["db_pass"]
 db = config["db"]
+
 connection = pymysql.connect(
     host=host,
     port=port,
     user=db_user,
     password=db_pass,
     db=db)
+
 cursor = connection.cursor(pymysql.cursors.DictCursor)
-
-# comment after initial running of bot.py
-#cursor.execute("DROP DATABASE IF EXISTS {};".format(db))
-cursor.execute("CREATE DATABASE IF NOT EXISTS {};".format(db))
-connection.commit()
-#########################################
-
 cursor.execute("USE {};".format(db))
 
 def run():

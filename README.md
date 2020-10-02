@@ -82,6 +82,7 @@ You should see a status message that says "active (running)".
 #### Creating SQL user, setting permissions for daily backups
 ```sql
 CREATE USER 'tipbot'@'localhost' IDENTIFIED BY 'SECUREP455W0RD';
+CREATE DATABASE IF NOT EXISTS DiscordTipBot;
 GRANT ALL ON mysql.* TO 'tipbot'@'localhost';
 GRANT ALL ON DiscordTipBot.* TO 'tipbot'@'localhost';
 GRANT SELECT, PROCESS ON *.* TO 'tipbot'@'localhost';
