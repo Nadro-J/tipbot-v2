@@ -3,7 +3,7 @@
     "url": "https://bitg.org",
     "thumbnail": "https://i.imgur.com/tTm8HtR.png",
     "icon": "https://i.imgur.com/o4DuN6L.png",
-    "ann_channel": ,
+    "ann_channel": 603721386082566144,
     "airdrop": "./configs/airdrop/current-airdrop.json",
     "sent": "./configs/airdrop/persistent-sent.json",
     "twitter": "./configs/airdrop/twitter-auth.json",
