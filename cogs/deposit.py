@@ -58,8 +58,10 @@ class Deposit(commands.Cog):
     @commands.command()
     async def dlist(self, ctx):
         """Show a list of your Deposits on this Tip Bot Service. TXID, Amount, and Deposit Status are displayed to easily track deposits."""
-        user = ctx.message.author
         txcounter = 0
+        user = ctx.message.author
+        snowflake = ctx.message.author.id
+        mysql.get_balance(str(snowflake), check_update=True)
 
         # only allow this message to be sent privatly for privacy - send a message to the user in the server.    
         if ctx.message.guild is not None:
