@@ -103,6 +103,12 @@ GRANT SELECT, PROCESS ON *.* TO 'tipbot'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
+#### Cronjob MySQL hourly backup
+```
+crontab -e
+0 * * * * ~/tipbot-v2/setup/data/mysql_backup.sh > ~/tipbot-v2/logs/mysql_backup.log 2>&1
+```
+
 ---
 
 ## Debugging/PM2 Setup

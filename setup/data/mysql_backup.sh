@@ -8,9 +8,9 @@ TODAY=`date +"%d%b%Y-%H%M%S"`
 DB_BACKUP_PATH='/backup/tipbot-sqldump'
 MYSQL_HOST='localhost'
 MYSQL_PORT='3306'
-MYSQL_USER=''
+MYSQL_USER='tipbot'
 MYSQL_PASSWORD=''
-DATABASE_NAME='mysql'
+DATABASE_NAME=''
 BACKUP_RETAIN_DAYS=7 ## Number of days to keep local backup copy
 #################################################################
 
