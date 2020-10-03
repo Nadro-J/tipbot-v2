@@ -53,10 +53,11 @@ class Twitter_commands(commands.Cog):
 
         # store everything in local variables, to be accessed to check if a user has
         # registered already or if the twitter account has already been claimed.
-        for i in range(0, len(registered_users['airdrop-users'])):
-            for id in registered_users['airdrop-users'][i].keys():
-                tmp_ids.append(id)
-                tmp_twitter.append(registered_users['airdrop-users'][i][id][0]['twitter'][0]['twitter-id'])
+        if len(registered_users['airdrop-users']) > 0:
+            for i in range(0, len(registered_users['airdrop-users'])):
+                for id in registered_users['airdrop-users'][i].keys():
+                    tmp_ids.append(id)
+                    tmp_twitter.append(registered_users['airdrop-users'][i][id][0]['twitter'][0]['twitter-id'])
 
         if parsing.check_duplicate(str(ctx.message.author.id), tmp_ids):
             embed = discord.Embed(color=self.error)
