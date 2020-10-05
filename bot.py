@@ -8,8 +8,8 @@ config = parsing.parse_json('config.json')
 skip_cogs=config['skip_cogs']
 
 Mysql = mysql_module.Mysql()
-
-bot = commands.Bot(command_prefix=config['prefix'], description=config["description"])
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix=config['prefix'], description=config["description"], intents=intents)
 
 try:
     os.remove("logs/log.txt")
