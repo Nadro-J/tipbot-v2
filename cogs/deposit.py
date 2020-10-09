@@ -38,12 +38,13 @@ class Deposit(commands.Cog):
         embed=discord.Embed(title="You requested your **Deposit Address**", color=self.embed_color)
         embed.set_author(name="{}".format(self.bot_name))
         embed.set_thumbnail(url="http://{}".format(self.thumb_embed))
+        embed.set_image(url=f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={user_addy}")
         embed.add_field(name=":man_farmer: User", value=ctx.message.author.mention, inline=True)
         embed.add_field(name=":moneybag: Balance",value="{:.8f} {}".format(round(float(balance), 8), self.currency_symbol), inline=True)
-        embed.add_field(name=":notepad_spiral: Deposit Address", value="`{}`".format(user_addy), inline=False)
+        embed.add_field(name=":notepad_spiral: Deposit Address", value="``{}``".format(user_addy), inline=False)
         if float(balance_unconfirmed) != 0.0:
             embed.add_field(name=":red_circle: Unconfirmed Deposits", value="{:.8f} {}".format(round(float(balance_unconfirmed), 8),self.currency_symbol))
-        embed.add_field(name=":newspaper: Deposit Transactions", value="Type $dlist for a list of your deposits.")
+        #embed.add_field(name=":newspaper: Deposit Transactions", value="Type $dlist for a list of your deposits.", inline=True)
         embed.set_footer(text=self.footer_text)
         try:
             await ctx.author.send(embed=embed)
