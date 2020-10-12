@@ -50,6 +50,7 @@ rpcport=8331
 rpcuser=<USERNAME>
 rpcpassword=<PASSWORD>
 staking=0
+rpcworkqueue=512
 ```
 
 #### Python libraries
