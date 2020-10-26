@@ -29,6 +29,7 @@ class Soak(commands.Cog):
 
     @commands.command(pass_context=True)
     @commands.check(checks.allow_soak)
+    @commands.cooldown(2, 300, commands.BucketType.user)
     async def soak(self, ctx, amount: float, role_id=""):
         """Tip all online users"""
         if ctx.message.guild is not None:
@@ -140,7 +141,6 @@ class Soak(commands.Cog):
                         await ctx.send("{}".format(' '.join(users_soaked_msg)))
                         del users_soaked_msg[:]
                         users_soaked_msg = []
-
 
     @commands.command()
     async def soak_info(self, ctx):

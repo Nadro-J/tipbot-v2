@@ -11,6 +11,7 @@ class Rain(commands.Cog):
         self.bot = bot
 
     @commands.command(pass_context=True)
+    @commands.cooldown(2, 300, commands.BucketType.user)
     async def rain(self, ctx, amount:float):
         """Rain all active users"""
 
@@ -45,18 +46,21 @@ class Rain(commands.Cog):
 
         # Create tip list
         active_id_users = mysql.get_active_users_id(RAIN_REQUIRED_USER_ACTIVITY_M, True)
-        
+
+        # Remove yourself from the list of active users to rain on
         if int(ctx.message.author.id) in active_id_users:
             active_id_users.remove(int(ctx.message.author.id))
 
-        #users_list is all members on the server   
-        users_list=[]            
+        # users_list is all members on the server that have registered with the bot
+        users_list=[]
         for user in ctx.message.guild.members:
             if mysql.check_for_user(user.id) is not None:
                 users_list.append(user)
 
+        # List all registered members
         server_users = [x for x in users_list]
 
+        # Remove yourself from the list of active users to rain on
         if ctx.message.author in server_users:
             server_users.remove(ctx.message.author)
 
