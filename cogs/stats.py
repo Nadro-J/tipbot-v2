@@ -11,7 +11,7 @@ class Stats(commands.Cog):
         self.embed_config = parsing.parse_json('config.json')["embed_msg"]
         self.thumb_embed = self.embed_config["thumb_embed_url"]
 
-    @commands.command()
+    @commands.command(aliases=['price'])
     async def coingecko(self, ctx):
         """
         Show stats about BitGreen

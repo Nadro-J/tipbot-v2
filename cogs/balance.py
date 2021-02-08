@@ -27,6 +27,12 @@ class Balance(commands.Cog):
         self.embed_color = int(embed_config["color"], 16)
 
     @commands.command(pass_context=True)
+    async def test(self, ctx):
+        embed=discord.Embed(title="You are now registered! :tada:\nUse {}deposit to view your {} address", color=self.embed_color)
+        embed.set_footer(text=self.footer_text)
+        await ctx.author.send(embed=embed)
+
+    @commands.command(pass_context=True, aliases=['bal'])
     async def balance(self, ctx):
         """Display your balance"""
         # Set important variables

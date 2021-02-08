@@ -31,7 +31,6 @@ class Airdrop_commands(commands.Cog):
     roles = parsing.load_json('./configs/airdrop/roles.json')['discord-roles']
 
     @commands.command()
-    @commands.has_any_role(*roles)
     async def getinfo(self, ctx):
         if ctx.message.guild is not None:
             await ctx.message.delete()
@@ -345,7 +344,7 @@ class Airdrop_commands(commands.Cog):
 
                                 total_sent = airdropConf['amount'] * len(rpc.recipients)
 
-                                # Account set to 100000000000000010 for testing, to be changed when in production
+                                # Account set to 100000000000000010 for test, to be changed when in production
                                 # Reflect balance on SQL DB
                                 mysql.remove_from_balance('100000000000000014', total_sent)
                                 mysql.add_withdrawal('100000000000000014', total_sent, rpc.lastWalletTx()['txid'])
